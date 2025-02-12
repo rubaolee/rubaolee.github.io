@@ -1,0 +1,1527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Virtual Memory - OSTEP Ch. 13–23</title>
+
+  <!-- Reveal.js core & the Beige theme from a CDN -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.3.1/dist/reveal.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.3.1/dist/theme/solarized.css" id="theme">
+  <link rel="stylesheet" href="https://unpkg.com/reveal.js/plugin/highlight/monokai.css">
+
+  <style>
+    /* Optional custom styles for headings, etc. */
+    h1, h2, h3 {
+      color: #005B9A; /* Dark blue for headings */
+      margin: 0.6em 0;
+    }
+    p, li {
+      color: #333; /* Dark gray text */
+      font-size: 1.0em; /* Adjust as needed for readability */
+    }
+    .diagram {
+      background: #eee;
+      display: inline-block;
+      padding: 1em;
+      border-radius: 8px;
+      color: #333;
+      font-family: monospace;
+      font-size: 0.9em;
+      margin-top: 1em;
+    }
+    .fragment {
+      transition: opacity 0.5s ease-in-out; /* Fade effect for fragments */
+    }
+  </style>
+</head>
+<body>
+
+<div class="reveal">
+  <div class="slides">
+
+    <!-- Title Slide -->
+    <section>
+      <h1>Virtual Memory Concepts</h1>
+      <h3>Based on <em>OS: Three Easy Pieces</em> (Ch. 13–23)</h3>
+      <p>By Rubao Lee</p>
+      <aside class="notes">
+        Introduce yourself, the course context, and the purpose of the talk.
+      </aside>
+    </section>
+
+
+    <!-- Address Spaces -->
+    <section>
+      <h2>Address Spaces (Ch. 13)</h2>
+      <p  style="color: red;">
+        <strong>Each process has its own contiguous memory space.</strong>
+      </p>
+      <p style="white-space: nowrap;">
+        <strong>Key Terms:</strong> virtual address and physical address.
+      </p>
+      <aside class="notes">
+        Address spaces simplify the programmer's view; the OS creates the illusion of private memory.
+      </aside>
+    </section>
+
+    <!-- Memory API -->
+    <section>
+      <h2>The Memory API (Ch. 14)</h2>
+      <ul>
+        <li class="fragment fade-in"><code>malloc()</code> and <code>free()</code> (heap management)</li>
+        <li class="fragment fade-in"><code>mmap()</code> (file/device mapping)</li>
+        <li class="fragment fade-in"><code>sbrk()</code> (adjust the program break)</li>
+      </ul>
+      <p class="fragment fade-in" style="white-space: nowrap;">
+        <strong>Challenges:</strong> Tracking allocations, managing fragmentation, etc.
+      </p>
+      <aside class="notes">
+        Possibly show a short code example of malloc/free usage if time permits.
+      </aside>
+    </section>
+
+    <!-- Address Translation Basics -->
+    <section>
+      <h2>Address Translation Basics (Ch. 15)</h2>
+      <p>
+        Converting <strong>Virtual Addresses</strong> to <strong>Physical Addresses</strong> via the MMU
+      </p>
+    
+      <!-- Inline SVG Diagram at 1.5x Scale -->
+      <div class="fragment fade-in">
+        <svg 
+          width="1050" 
+          height="300"
+          viewBox="0 0 700 200" 
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <!-- Arrowhead marker definition -->
+          <defs>
+            <marker 
+              id="arrowhead"
+              markerWidth="6"
+              markerHeight="6"
+              refX="5" 
+              refY="3"
+              orient="auto"
+            >
+              <path d="M0,0 L0,6 L6,3 z" fill="currentColor" />
+            </marker>
+          </defs>
+    
+          <!-- CPU (blue) -->
+          <rect x="50" y="50" width="120" height="80" fill="#3366cc"></rect>
+          <text
+            x="110" 
+            y="95" 
+            fill="#ffffff" 
+            text-anchor="middle" 
+            font-size="16"
+            font-family="sans-serif"
+          >
+            CPU
+          </text>
+    
+          <!-- Arrow from CPU to MMU (blue line) -->
+          <line 
+            x1="170" y1="90" 
+            x2="290" y2="90" 
+            stroke="#3366cc"
+            stroke-width="3"
+            marker-end="url(#arrowhead)"
+          />
+          <text
+            x="230"
+            y="75"
+            fill="#000000"
+            text-anchor="middle"
+            font-size="14"
+            font-family="sans-serif"
+          >
+            virtual address
+          </text>
+    
+          <!-- MMU (orange) -->
+          <rect x="290" y="50" width="120" height="80" fill="#f0a500"></rect>
+          <text
+            x="350"
+            y="90"
+            fill="#ffffff"
+            text-anchor="middle"
+            font-size="14"
+            font-family="sans-serif"
+          >
+            MMU
+          </text>
+          <text
+            x="350"
+            y="107"
+            fill="#ffffff"
+            text-anchor="middle"
+            font-size="10"
+            font-family="sans-serif"
+          >
+            (Memory Management Unit)
+          </text>
+    
+          <!-- Arrow from MMU to Memory (green line) -->
+          <line 
+            x1="410" y1="90"
+            x2="540" y2="90"
+            stroke="#66cc66"
+            stroke-width="3"
+            marker-end="url(#arrowhead)"
+          />
+          <text
+            x="475"
+            y="75"
+            fill="#000000"
+            text-anchor="middle"
+            font-size="14"
+            font-family="sans-serif"
+          >
+            physical address
+          </text>
+    
+          <!-- Memory (green) -->
+          <rect x="540" y="30" width="60" height="130" fill="#66cc66"></rect>
+          <text
+            x="570"
+            y="100"
+            fill="#ffffff"
+            text-anchor="middle"
+            font-size="14"
+            font-family="sans-serif"
+          >
+            Memory
+          </text>
+        </svg>
+      </div>
+    
+      <aside class="notes">
+        This enlarged diagram scales the original 700×200 coordinate space to 1050×300,
+        giving a 1.5× bigger view. Each memory access from the CPU first goes to the MMU,
+        which translates the virtual address to a physical address for accessing memory.
+      </aside>
+    </section>
+    
+    
+
+    <!-- Segmentation -->
+    <section>
+      <h2>Segmentation (Ch. 16)</h2>
+      <ul>
+        <li class="fragment fade-in"><strong>Base + Limit Registers</strong> for code/data, heap, stack</li>
+        <li class="fragment fade-in">Pros: Matches logical structure</li>
+        <li class="fragment fade-in" style="white-space: nowrap;">Cons: External fragmentation, limited # of segments</li>
+      </ul>
+      <div class="diagram fragment fade-in">
+        <p>
+          Virtual Address: Segment ID + Offset
+          Physical Address = Base[Segment ID] + Offset
+        </p>
+      </div>
+      <aside class="notes">
+        Segmentation alone isn’t common anymore, but it was an important step towards paging.
+      </aside>
+    </section>
+
+    <!-- Free-Space Management -->
+    <section>
+      <h2>Free-Space Management (Ch. 17)</h2>
+      <p>
+        Fragmentation: External vs Internal
+      </p>
+      <ul>
+        <li class="fragment fade-in" style="white-space: nowrap;">First-Fit: Allocate the <strong>first</strong> block that fits the request.</li>
+        <li class="fragment fade-in" style="white-space: nowrap;">Best-Fit: Allocate the <strong>smallest</strong> block that fits the request.</li>
+        <li class="fragment fade-in" style="white-space: nowrap;">Worst-Fit: Allocate the <strong>largest</strong> block that fits the request.</li>
+      </ul>
+    
+      <!-- SVG Example -->
+      <div class="fragment fade-in">
+        <svg
+          width="800"
+          height="300"
+          viewBox="0 0 800 300"
+          xmlns="http://www.w3.org/2000/svg"
+          style="border: 1px solid #ccc;"
+        >
+          <!-- Free nodes (blocks) -->
+          <!-- Node 1: Size 25 -->
+          <rect x="50" y="50" width="250" height="50" fill="#f0a500" stroke="#000000" stroke-width="2" />
+          <text x="175" y="80" fill="#000000" font-family="sans-serif" font-size="16" text-anchor="middle">Size 25</text>
+          
+          <!-- Node 2: Size 30 -->
+          <rect x="50" y="120" width="300" height="50" fill="#00b050" stroke="#000000" stroke-width="2" />
+          <text x="200" y="150" fill="#ffffff" font-family="sans-serif" font-size="16" text-anchor="middle">Size 30</text>
+          
+          <!-- Node 3: Size 20 -->
+          <rect x="50" y="190" width="200" height="50" fill="#0070c0" stroke="#000000" stroke-width="2" />
+          <text x="150" y="220" fill="#ffffff" font-family="sans-serif" font-size="16" text-anchor="middle">Size 20</text>
+          
+          <!-- Request -->
+          <text x="500" y="30" fill="#ff0000" font-family="sans-serif" font-size="18" text-anchor="middle">Request: Size 15</text>
+    
+          <!-- Arrows for selection -->
+          <!-- First-Fit chooses Size 25 (Now centered) -->
+          <line x1="175" y1="75" x2="500" y2="75" stroke="#000000" stroke-width="2" marker-end="url(#arrowhead)" />
+          <text x="550" y="75" fill="#000000" font-family="sans-serif" font-size="14">First-Fit</text>
+          
+          <!-- Best-Fit chooses Size 20 -->
+          <line x1="150" y1="220" x2="500" y2="220" stroke="#000000" stroke-width="2" marker-end="url(#arrowhead)" />
+          <text x="550" y="220" fill="#000000" font-family="sans-serif" font-size="14">Best-Fit</text>
+          
+          <!-- Worst-Fit chooses Size 30 -->
+          <line x1="200" y1="150" x2="500" y2="150" stroke="#000000" stroke-width="2" marker-end="url(#arrowhead)" />
+          <text x="550" y="150" fill="#000000" font-family="sans-serif" font-size="14">Worst-Fit</text>
+          
+          <!-- Arrowhead definition -->
+          <defs>
+            <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+              <polygon points="0 0, 10 3.5, 0 7" fill="#000000" />
+            </marker>
+          </defs>
+        </svg>
+      </div>
+    
+      <aside class="notes">
+        This example demonstrates how three free nodes of size 25, 30, and 20 are selected based on the request of size 15. 
+        - First-Fit chooses the first block (Size 25).
+        - Best-Fit selects the smallest suitable block (Size 20).
+        - Worst-Fit selects the largest block (Size 30).
+      </aside>
+    </section>
+    
+    
+
+    <!-- Paging -->
+    <section>
+      <h2>Paging (Ch. 18)</h2>
+      <p>
+        Divide the address into <strong>virtual page #</strong> + <strong>offset</strong>, 
+        use the <strong>page table</strong> to find the <strong>physical page/frame #</strong>, 
+        and keep the same offset.
+      </p>
+    
+      <div class="fragment fade-in">
+        <img
+        src="vp.png"
+        alt="Paging Diagram"
+        style="width: 100%; max-width: 1200px;" 
+      />
+    </div>
+    
+      <aside class="notes">
+        This diagram matches the color layout in the provided screenshot:
+        - Top row: red (virtual page #) and purple (offset)
+        - Bottom row: green (physical page/frame #) and purple (offset)
+        - Page table in the middle (blue boxes, red outline)
+        - Colored arrows matching each region
+      </aside>
+    </section>
+    
+    
+    
+
+    <!-- TLB -->
+    <section>
+      <h2>TLB (Ch. 19)</h2>
+      <h2>Translation Lookaside Buffer</h2>
+      <ul>
+        <li class="fragment fade-in" style="white-space: nowrap;"><strong style="color: red;">Hardware cache</strong> for frequently used page-table entries</li>
+        <li class="fragment fade-in" style="white-space: nowrap;"><strong>TLB Hit Rate</strong> crucial to performance</li>
+        <li class="fragment fade-in" style="white-space: nowrap;">TLB Miss → slower page table lookup (or page fault)</li>
+      </ul>
+      <aside class="notes">
+        TLB replacement policies also matter due to limited TLB size.
+      </aside>
+    </section>
+
+    <!-- Advanced Page Tables -->
+    <section>
+      <h2>Advanced Page Tables (Ch. 20)</h2>
+      <ul>
+        <li class="fragment fade-in">Goal: reduce memory usage of large page tables</li>
+        <li class="fragment fade-in">Large Page Size (e.g., 4KB -> 4MB)</li>
+        <li class="fragment fade-in">Multi-Level Paging (2-level, 3-level, etc.)</li>
+        <li class="fragment fade-in">Inverted Page Tables (using hash table)</li>
+      </ul>
+
+        <div class="fragment fade-in">
+          <img
+            src="pagetable.png"
+            alt="VM Flowchart"
+            style="width: 80%; max-width: 1200px;"
+          />
+        </div>
+
+      
+    </section>
+
+  
+    <section>
+
+  
+      <img src="intel5.png" alt="5-Level Paging Diagram" style="max-width: 80%; height: auto;">
+    </section>
+
+    <!-- Swapping Mechanisms -->
+    <section>
+      <h2>Swapping Mechanisms (Ch. 21)</h2>
+      <ul>
+        <li class="fragment fade-in">Swap pages to disk if memory is full</li>
+        <li class="fragment fade-in">On page fault, bring page in (“swap in”)</li>
+        <li class="fragment fade-in">Evict a “victim” page if no free frame is available</li>
+      </ul>
+      <aside class="notes">
+        Swapping allows overcommitting memory but can severely degrade performance (disk I/O).
+      </aside>
+    </section>
+
+    <!-- Swapping Policies -->
+    <section>
+      <h2>Swapping Policies (Ch. 22)</h2>
+      <ul>
+        <li class="fragment fade-in">MIN/OPT (ideal but impractical)</li>
+        <li class="fragment fade-in">FIFO (First In, First Out)</li>
+        <li class="fragment fade-in">LRU (Least Recently Used)</li>
+      </ul>
+      <aside class="notes">
+        Different workloads benefit from different replacement policies.
+      </aside>
+    </section>
+
+    <!-- Putting It All Together -->
+    <section>
+      <h2 style="white-space: nowrap;">Putting It All Together (Ch.&nbsp;23)</h2>
+      <p style="white-space: nowrap;"><strong>Modern OS = Segmentation + Paging + TLB + Swapping</strong></p>
+      <ul>
+        <li class="fragment fade-in">Memory Protection &amp; Isolation</li>
+        <li class="fragment fade-in">Abstraction of large virtual space</li>
+        <li class="fragment fade-in">Efficient resource usage</li>
+      </ul>
+      <aside class="notes">
+        Most modern systems rely on paging + TLB for speed, and swapping for flexibility.
+      </aside>
+    </section>
+
+    <!-- Example: One Memory Access -->
+    <section>
+      <h2>One memory access</h2>
+    
+      <!-- Embed the uploaded image -->
+      <div class="fragment fade-in">
+        <img
+          src="vmflow.png"
+          alt="VM Flowchart"
+          style="width: 100%; max-width: 1200px;"
+        />
+      </div>
+    
+    </section>
+
+    <!-- Summary -->
+    <section>
+      <h2>Summary</h2>
+      <ul>
+        <li class="fragment fade-in">Virtual Memory is a powerful abstraction</li>
+        <li class="fragment fade-in">Hardware/Software co-design</li>
+        <li class="fragment fade-in">Trade-offs: overhead vs. protection &amp; simplicity</li>
+      </ul>
+      <aside class="notes">
+        Highlight the synergy of hardware (MMU, TLB) and OS (page tables, swapping).
+      </aside>
+    </section>
+
+<section>
+  <h2>Code Examples</h2>
+  <ul>
+    <li class="fragment fade-in">program</li>
+    <li class="fragment fade-in">process</li>
+    <li class="fragment fade-in">memory</li>
+  </ul>
+</section>
+
+<section>
+  <h2>program</h2>
+</section>
+
+    <section>
+      <h2>A Simple C Program simple.c</h2>
+      <pre><code class="language-c" data-trim data-noescape>
+        int global_a = 0xAA1122BB;
+        int global_b = 0xCC4455DD;
+        int myadd(int arg_x, int arg_y)
+        {
+          int local_z = arg_x + arg_y;
+          return local_z;
+        }
+        int main(void)
+        {
+          int main_z = myadd(global_a, global_b);
+          return main_z;
+        }
+        </code></pre>
+        <ul>
+          <li class="fragment fade-in">compile: gcc -o <strong style="color:red">simple.run</strong> simple.c</li>
+        </ul>
+      
+    </section>
+
+    <section>
+      <h2>What is simple.run?</h2>
+      <ul>
+        <li class="fragment fade-in">hexdump: displays the contents of a file in hexadecimal format, along with a corresponding ASCII representation</li>
+      </ul>
+      <pre class="fragment fade-in"><code class="language-bash" data-trim data-noescape>
+        lestat@X0:~$ hexdump -C simple | head -n 8
+        00000000  7f 45 4c 46 02 01 01 00  00 00 00 00 00 00 00 00  |.ELF............|
+        00000010  02 00 3e 00 01 00 00 00  47 10 40 00 00 00 00 00  |..>.....G.@.....|
+        00000020  40 00 00 00 00 00 00 00  60 21 00 00 00 00 00 00  |@.......`!......|
+        00000030  00 00 00 00 40 00 38 00  04 00 40 00 06 00 05 00  |....@.8...@.....|
+        00000040  01 00 00 00 04 00 00 00  00 00 00 00 00 00 00 00  |................|
+      </code></pre>
+    </section>
+
+    <section>
+      <h2>ELF: Executable and Linkable Format</h2>
+    
+    <ul  style="text-align: left; width: 200%; margin: 0;">
+      <li class="fragment fade-in">ELF: the standard binary file format for Unix.</li>
+      <li class="fragment fade-in">Each ELF file is made up of one ELF header, followed by file data:</li>
+      <br>
+      <li class="fragment fade-in">Program header table, describing zero or more memory segments</li>
+      <li class="fragment fade-in">Section header table, describing zero or more sections</li>
+      <li class="fragment fade-in">Data referred to by entries in the header tables</li>
+      
+    </ul>
+    </section>
+
+
+
+    <section>
+      <h2>READELF</h2>
+      <pre class="fragment fade-in"><code class="language-bash" data-trim data-noescape>
+      lestat@X0:~$ readelf -a simple.run
+      ELF Header:
+        Magic:   7f 45 4c 46 02 01 01 00 00 00 00 00 00 00 00 00
+        Class:                             ELF64
+        Data:                              2's complement, little endian
+        Version:                           1 (current)
+        OS/ABI:                            UNIX - System V
+        ABI Version:                       0
+        Type:                              DYN (Position-Independent Executable file)
+        Machine:                           Advanced Micro Devices X86-64
+        Version:                           0x1
+        Entry point address:               0x1040
+        Start of program headers:          64 (bytes into file)
+        Start of section headers:          14024 (bytes into file)
+        Flags:                             0x0
+        Size of this header:               64 (bytes)
+        Size of program headers:           56 (bytes)
+        Number of program headers:         13
+        Size of section headers:           64 (bytes)
+        Number of section headers:         29
+        Section header string table index: 28
+</code></pre>
+    </section>
+
+    <section>
+    <h2>Make it simplified</h2>
+    <ul  style="text-align: left; width: 100%; margin: 0;">
+      <pre  class="fragment fade-in"><code class="language-c" data-trim data-noescape>
+        int global_a = 0xAA1122BB;
+        int global_b = 0xCC4455DD;
+        int myadd(int arg_x, int arg_y)
+        {
+          int local_z = arg_x + arg_y;
+          return local_z;
+        }
+        int main(void)
+        {
+          int main_z = myadd(global_a, global_b);
+          return main_z;
+        }
+        </code></pre>
+      <pre class="fragment fade-in"><code class="language-bash" data-trim data-noescape>
+        lestat@X0:~$ gcc -nostdlib \
+        >                -static   \
+        >                -fno-asynchronous-unwind-tables \
+        >                -Wl,--build-id=none \
+        >                -fno-ident \
+        >                -o simple.run \
+        >                simple.c mystart.s
+    </code></pre>
+  </ul>
+</section>
+
+  <section>
+    <h2> We need a .start!</h2>
+    <pre  class="fragment fade-in"><code class="language-c" data-trim data-noescape>
+      .global _start
+      _start:
+              call main
+              mov %rax, %rdi        # move main's return value to RDI (exit code)
+              mov $60, %rax         # syscall: exit (on x86_64 Linux)
+              syscall
+      </code></pre>
+      <pre class="fragment fade-in"><code class="language-bash" data-trim data-noescape>
+        lestat@X0:~$ gcc -nostdlib \
+        >                -static   \
+        >                -fno-asynchronous-unwind-tables \
+        >                -Wl,--build-id=none \
+        >                -fno-ident \
+        >                -o simple.run \
+        >                simple.c mystart.s
+    </code></pre>
+    </section>
+
+
+    <section>
+      <h2>READELF: header</h2>
+      <pre class="fragment fade-in"><code class="language-bash" data-trim data-noescape>
+        lestat@X0:~$ readelf -h simple.run
+        ELF Header:
+          Magic:   7f 45 4c 46 02 01 01 00 00 00 00 00 00 00 00 00
+          Class:                             ELF64
+          Data:                              2's complement, little endian
+          Version:                           1 (current)
+          OS/ABI:                            UNIX - System V
+          ABI Version:                       0
+          Type:                              EXEC (Executable file)
+          Machine:                           Advanced Micro Devices X86-64
+          Version:                           0x1
+          Entry point address:               0x401047
+          Start of program headers:          64 (bytes into file)
+          Start of section headers:          8544 (bytes into file)
+          Flags:                             0x0
+          Size of this header:               64 (bytes)
+          Size of program headers:           56 (bytes)
+          Number of program headers:         4
+          Size of section headers:           64 (bytes)
+          Number of section headers:         6
+          Section header string table index: 5
+</code></pre>
+    </section>
+
+    <section>
+      <h2>READELF: sections</h2>
+      <pre class="fragment fade-in"><code class="language-bash" data-trim data-noescape>
+        lestat@X0:~$ readelf -S simple.run
+        There are 6 section headers, starting at offset 0x2160:
+
+        Section Headers:
+          [Nr] Name              Type             Address           Offset
+              Size              EntSize          Flags  Link  Info  Align
+          [ 0]                   NULL             0000000000000000  00000000
+              0000000000000000  0000000000000000           0     0     0
+          [ 1] .text             PROGBITS         0000000000401000  00001000
+              0000000000000058  0000000000000000  AX       0     0     1
+          [ 2] .data             PROGBITS         0000000000402000  00002000
+              0000000000000008  0000000000000000  WA       0     0     4
+          [ 3] .symtab           SYMTAB           0000000000000000  00002008
+              00000000000000f0  0000000000000018           4     2     8
+          [ 4] .strtab           STRTAB           0000000000000000  000020f8
+              000000000000003f  0000000000000000           0     0     1
+          [ 5] .shstrtab         STRTAB           0000000000000000  00002137
+              0000000000000027  0000000000000000           0     0     1
+        Key to Flags:
+          W (write), A (alloc), X (execute), M (merge), S (strings), I (info),
+          L (link order), O (extra OS processing required), G (group), T (TLS),
+          C (compressed), x (unknown), o (OS specific), E (exclude),
+          D (mbind), l (large), p (processor specific)
+</code></pre>
+    </section>
+
+    <section>
+      <ul  style="text-align: left; width: 100%; margin: 0;">
+        <pre  class="fragment fade-in"><code class="language-c" data-trim data-noescape>
+          int global_a = 0xAA1122BB;
+          int global_b = 0xCC4455DD;
+          int myadd(int arg_x, int arg_y)
+          {
+            int local_z = arg_x + arg_y;
+            return local_z;
+          }
+          int main(void)
+          {
+            int main_z = myadd(global_a, global_b);
+            return main_z;
+          }
+          </code></pre>
+        <pre class="fragment fade-in"><code class="language-bash" data-trim data-noescape>
+          lestat@X0:~$ objdump -s simple.run
+          simple.run:     file format elf64-x86-64
+          Contents of section .text:
+           401000 f30f1efa 554889e5 897dec89 75e88b55  ....UH...}..u..U
+           401010 ec8b45e8 01d08945 fc8b45fc 5dc3f30f  ..E....E..E.]...
+           401020 1efa5548 89e54883 ec108b15 d40f0000  ..UH..H.........
+           401030 8b05ca0f 000089d6 89c7e8c1 ffffff89  ................
+           401040 45fc8b45 fcc9c3e8 d2ffffff 4889c748  E..E........H..H
+           401050 c7c03c00 00000f05                    ..<.....
+          Contents of section .data:
+           402000 bb2211aa dd5544cc                    ."...UD.
+      </code></pre>
+    </ul>
+  </section>
+
+
+  <section>
+    <h2>objdump: show the code</h2>
+    <ul  style="text-align: left; width: 100%; margin: 0;">
+      <pre  class="fragment fade-in"><code class="language-x86asm" data-trim data-noescape>
+        lestat@X0:~$ objdump -d simple.run
+
+        simple.run:     file format elf64-x86-64
+        
+        
+        Disassembly of section .text:
+        
+        0000000000401000 &lt;myadd&gt;
+          401000:       f3 0f 1e fa             endbr64
+          401004:       55                      push   %rbp
+          401005:       48 89 e5                mov    %rsp,%rbp
+          401008:       89 7d ec                mov    %edi,-0x14(%rbp)
+          40100b:       89 75 e8                mov    %esi,-0x18(%rbp)
+          40100e:       8b 55 ec                mov    -0x14(%rbp),%edx
+          401011:       8b 45 e8                mov    -0x18(%rbp),%eax
+          401014:       01 d0                   add    %edx,%eax
+          401016:       89 45 fc                mov    %eax,-0x4(%rbp)
+          401019:       8b 45 fc                mov    -0x4(%rbp),%eax
+          40101c:       5d                      pop    %rbp
+          40101d:       c3                      ret
+        
+        000000000040101e &lt;main&gt;:
+          40101e:       f3 0f 1e fa             endbr64
+          401022:       55                      push   %rbp
+          401023:       48 89 e5                mov    %rsp,%rbp
+          401026:       48 83 ec 10             sub    $0x10,%rsp
+          40102a:       8b 15 d4 0f 00 00       mov    0xfd4(%rip),%edx        # 402004 &lt;global_b&gt;
+          401030:       8b 05 ca 0f 00 00       mov    0xfca(%rip),%eax        # 402000 &lt;global_a&gt;
+          401036:       89 d6                   mov    %edx,%esi
+          401038:       89 c7                   mov    %eax,%edi
+          40103a:       e8 c1 ff ff ff          call   401000 &lt;myadd&gt;
+          40103f:       89 45 fc                mov    %eax,-0x4(%rbp)
+          401042:       8b 45 fc                mov    -0x4(%rbp),%eax
+          401045:       c9                      leave
+          401046:       c3                      ret
+        
+        0000000000401047 &lt;_start&gt;:
+          401047:       e8 d2 ff ff ff          call   40101e &lt;main&gt;
+          40104c:       48 89 c7                mov    %rax,%rdi
+          40104f:       48 c7 c0 3c 00 00 00    mov    $0x3c,%rax
+          401056:       0f 05                   syscall
+        </code></pre>
+
+  </ul>
+</section>
+<section>
+  <h2>sections to segments</h2>
+  <ul  style="text-align: left; width: 100%; margin: 0;">
+    <pre  class="fragment fade-in"><code class="language-bash" data-trim data-noescape>
+      lestat@X0:~$ readelf --segments simple.run
+
+      Elf file type is EXEC (Executable file)
+      Entry point 0x401047
+      There are 4 program headers, starting at offset 64
+
+      Program Headers:
+        Type           Offset             VirtAddr           PhysAddr
+                      FileSiz            MemSiz              Flags  Align
+        LOAD           0x0000000000000000 0x0000000000400000 0x0000000000400000
+                      0x0000000000000120 0x0000000000000120  R      0x1000
+        LOAD           0x0000000000001000 0x0000000000401000 0x0000000000401000
+                      0x0000000000000058 0x0000000000000058  R E    0x1000
+        LOAD           0x0000000000002000 0x0000000000402000 0x0000000000402000
+                      0x0000000000000008 0x0000000000000008  RW     0x1000
+        GNU_STACK      0x0000000000000000 0x0000000000000000 0x0000000000000000
+                      0x0000000000000000 0x0000000000000000  RWE    0x10
+
+      Section to Segment mapping:
+        Segment Sections...
+        00
+        01     .text
+        02     .data
+        03
+  </code></pre>
+
+  <p class="fragment fade-in">The program tells OS how it will use memory!</p>
+
+</ul>
+</section>
+
+<section>
+  <h2>A Simple C Program simple.c</h2>
+  <pre><code class="language-c" data-trim data-noescape>
+    int global_a = 0xAA1122BB;
+    int global_b = 0xCC4455DD;
+    int myadd(int arg_x, int arg_y)
+    {
+      int local_z = arg_x + arg_y;
+      return local_z;
+    }
+    int main(void)
+    {
+      int main_z = myadd(global_a, global_b);
+      return main_z;
+    }
+    </code></pre>
+
+  </section>
+
+    <section>
+      <h2>simple-2.c</h2>
+      <pre><code class="language-c" data-trim data-noescape>
+        int global_a = 0xAA1122BB;
+        int global_b = 0xCC4455DD;
+        int global_c;
+        int global_d;
+        char *global_hw = "Hello, world!";
+        int myadd(int arg_x, int arg_y)
+        {
+          int local_z = arg_x + arg_y;
+          return local_z;
+        }
+        int main(void)
+        {
+          int main_z = myadd(global_a, global_b);
+          return main_z;
+        }
+        </code></pre>
+
+</section>
+
+<section>
+  <ul  style="text-align: left; width: 100%; margin: 0;">
+    
+    <pre class="fragment fade-in"><code class="language-bash" data-trim data-noescape>
+        lestat@X0:~$ objdump -s simple-2
+
+        simple-2:     file format elf64-x86-64
+
+        Contents of section .text:
+        401000 f30f1efa 554889e5 897dec89 75e88b55  ....UH...}..u..U
+        401010 ec8b45e8 01d08945 fc8b45fc 5dc3f30f  ..E....E..E.]...
+        401020 1efa5548 89e54883 ec108b15 e41f0000  ..UH..H.........
+        401030 8b05da1f 000089d6 89c7e8c1 ffffff89  ................
+        401040 45fc8b45 fcc9c3e8 d2ffffff 4889c748  E..E........H..H
+        401050 c7c03c00 00000f05                    ..<.....
+        Contents of section .rodata:
+        402000 48656c6c 6f2c2077 6f726c64 2100      Hello, world!.
+
+        Contents of section .data:
+        403010 bb2211aa dd5544cc 00204000 00000000  ."...UD.. @.....
+</code></pre>
+</section>
+
+
+<section>
+  <h2>sections</h2>
+  <ul  style="text-align: left; width: 100%; margin: 0;">
+    <pre  class="fragment fade-in"><code class="language-bash" data-trim data-noescape>
+      lestat@X0:~$ readelf -a simple-2
+      [ 1] .text             PROGBITS         0000000000401000  00001000
+      0000000000000058  0000000000000000  AX       0     0     1
+      [ 2] .rodata           PROGBITS         0000000000402000  00002000
+      000000000000000e  0000000000000000   A       0     0     1
+      [ 3] .data             PROGBITS         0000000000403010  00002010
+      0000000000000010  0000000000000000  WA       0     0     8
+      [ 4] .bss              NOBITS           0000000000403020  00002020
+      0000000000000008  0000000000000000  WA       0     0     4 
+  </code></pre>
+
+  <ul>
+    <li class="fragment fade-in">.text: code</li>
+    <li class="fragment fade-in">.data: initialized data</li>
+    <li class="fragment fade-in">.rodata: read-only data</li>
+    <li class="fragment fade-in">.bss: Block Started by Symbol,uninitialized data</li>
+  </ul>
+</section>
+
+
+  <section>
+    <h2>simple-2.c</h2>
+    <pre><code class="language-c" data-trim data-noescape>
+      int global_a = 0xAA1122BB; //.data
+      int global_b = 0xCC4455DD; //.data
+      int global_c;  //.bss
+      int global_d;  //.bss
+      char *global_hw = "Hello, world!"; //.rodata
+      int myadd(int arg_x, int arg_y)   //.text
+      {                                 //.text
+        int local_z = arg_x + arg_y;    //.text
+        return local_z;                 //.text
+      }                                 //.text
+      int main(void)                    //.text
+      {                                 //.text
+        int main_z = myadd(global_a, global_b); //.text
+        return main_z; //.text
+      } //.text
+      </code></pre>
+
+</section>
+
+</ul>
+</section>
+<section>
+  <h2>sections to segments</h2>
+  <ul  style="text-align: left; width: 100%; margin: 0;">
+    <pre  class="fragment fade-in"><code class="language-bash" data-trim data-noescape>
+      lestat@X0:~$ readelf --segments simple-2
+
+      Elf file type is EXEC (Executable file)
+      Entry point 0x401047
+      There are 5 program headers, starting at offset 64
+      
+      Program Headers:
+        Type           Offset             VirtAddr           PhysAddr
+                       FileSiz            MemSiz              Flags  Align
+        LOAD           0x0000000000000000 0x0000000000400000 0x0000000000400000
+                       0x0000000000000158 0x0000000000000158  R      0x1000
+        LOAD           0x0000000000001000 0x0000000000401000 0x0000000000401000
+                       0x0000000000000058 0x0000000000000058  R E    0x1000
+        LOAD           0x0000000000002000 0x0000000000402000 0x0000000000402000
+                       0x000000000000000e 0x000000000000000e  R      0x1000
+        LOAD           0x0000000000002010 0x0000000000403010 0x0000000000403010
+                       0x0000000000000010 0x0000000000000018  RW     0x1000
+        GNU_STACK      0x0000000000000000 0x0000000000000000 0x0000000000000000
+                       0x0000000000000000 0x0000000000000000  RWE    0x10
+      
+       Section to Segment mapping:
+        Segment Sections...
+         00
+         01     .text
+         02     .rodata
+         03     .data .bss
+         04
+  </code></pre>
+
+</ul>
+</section>
+
+<section>
+  <h2>Segments</h2>
+  <ul>
+    <li class="fragment fade-in">Segment 0: ELF header/data (Read-only)</li>
+    <li class="fragment fade-in">Segment 1: .text (Read+Execute)</li>
+    <li class="fragment fade-in">Segment 2: .rodata (Read-only)</li>
+    <li class="fragment fade-in">Segment 3: .data+.bss (Read+Write)</li>
+    <li class="fragment fade-in">Segment 4: Stack (Read+Write+<strong style="color:red">Execute</strong>)</li>
+  </ul>
+
+  <p></p>
+  <p class="fragment fade-in">Segment 0-3: size already known.</p>
+  <p class="fragment fade-in">Segment 4: Stack -- size unknown.</p>
+  <p></p>
+  <p class="fragment fade-in">That is the information stored in the program!</p>
+
+
+</section>
+
+<section>
+  <h2>program to process</h2>
+  <ul>
+    <li class="fragment fade-in">shell: for()+exec()</li>
+    <li class="fragment fade-in">execvp("./simple.run", argv)</li>
+    <li class="fragment fade-in">How does exec() work?</li>
+  </ul>
+
+</section>
+
+<section>
+  <h2>Steps of the <code>exec()</code> System Call</h2>
+  <ul>
+    <li class="fragment fade-in"><strong>1️⃣ Read and Parse the ELF File:</strong> Open the file, read ELF headers, check validity.</li>
+    <li class="fragment fade-in"><strong>2️⃣ Set Up Memory and Page Tables:</strong> Unmap old memory, load new segments, update page tables.</li>
+    <li class="fragment fade-in"><strong>3️⃣ Set Up Registers and Stack:</strong> Push `argc`, `argv`, `envp`, align stack, initialize CPU registers.</li>
+    <li class="fragment fade-in"><strong>4️⃣ Jump to Entry Point:</strong> Set `RIP` (or `PC`) to entry point and start execution.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>What Happens After <code>exec()</code>?</h2>
+  <ul>
+    <li class="fragment fade-in"><strong>Static Linking:</strong> The program starts immediately.</li>
+    <li class="fragment fade-in"><strong>Dynamic Linking:</strong> The Linux Loader (<code>ld.so</code>) takes control.</li>
+    <li class="fragment fade-in"><strong>Linux Loader Steps:</strong></li>
+    <ul class="fragment fade-in">
+      <li >Reads the ELF <code>PT_INTERP</code> segment.</li>
+      <li >Loads required shared libraries.</li>
+      <li >Performs symbol resolution & relocations.</li>
+      <li >Transfers execution to the program entry.</li>
+    </ul>
+  </ul>
+</section>
+
+<section>
+  <h2>Set Up Memory</h2>
+  <ul>
+    <li class="fragment fade-in">For each segment to be mapped into memory:</li>
+    <BR>
+    <li class="fragment fade-in">Allocates virtual memory pages accordingly.</li>
+    <li class="fragment fade-in">Initilize the memory page contents.</li>
+    <li class="fragment fade-in">Applies the correct protection flags (R, W, X).</li>    
+    <BR>
+    <li class="fragment fade-in">Stack segment: allocated with a default size</li>
+    <li class="fragment fade-in">Heap segment: only the starting address is determined (called program break)</li>    
+    </ul>
+  </ul>
+</section>
+
+
+<section>
+  <h2>A demo</h2>
+  <pre class="fragment fade-in"><code class="language-text" data-trim>
+    +----------------------+
+    |     Stack Segment    |
+    | (Function Calls)     |
+    +----------------------+
+    |     Heap Segment     |
+    | (Dynamic Memory)     |
+    +----------------------+
+    |      Data Segment    |
+    | (Global Variables)   |
+    +----------------------+
+    |      Code Segment    |
+    |  (Executable Code)   |
+    +----------------------+
+  </code></pre>
+
+  <ul>
+    <li class="fragment fade-in">Segmentation is a software-level organization used in ELF.</li>
+    <li class="fragment fade-in">CPU/OS may only use paging-based virtual memory. No segmentations!</li>
+  </ul>
+</section>
+
+<section>
+  <h2>Set Up Page Table</h2>
+
+  <!-- Embed the uploaded image -->
+  <div class="fragment fade-in">
+    <img
+      src="execpt.png"
+      alt="Initilized Page Table"
+      style="width: 30%; "
+    />
+  </div>
+
+</section>
+
+<section>
+  <h2>process memory management</h2>
+  <ul>
+    <li class="fragment fade-in">Where are they?</li>
+    <li class="fragment fade-in">What does an OS do?</li>
+  </ul>
+
+</section>
+
+<section>
+  <h2>simple-3.c</h2>
+  <pre><code class="language-c" data-trim data-noescape>
+      #include &lt;stdio.h&gt;
+      #include &lt;stdlib.h&gt;
+      #include &lt;stdint.h&gt;
+      int global_x = 1234;
+      int global_y = 5678;
+      int my_add(int arg_x, int arg_y, int layer)
+      {
+        int stack_z = 0;
+        stack_z = arg_x + arg_y;
+        return stack_z;
+      }
+      int main()
+      {
+        int main_x = global_x;
+        int main_y = global_y;
+        int main_z = 0; 
+        main_z  = my_add(main_x, main_y, 1);
+        int* heap_pointer_1 = malloc(sizeof(int));
+        int* heap_pointer_2 = malloc(sizeof(int));
+        int* heap_pointer_3 = malloc(sizeof(int));
+        free(heap_pointer_1);
+        free(heap_pointer_2);
+        free(heap_pointer_3);
+        return 0;
+      }
+      
+    </code></pre>
+
+</section>
+
+
+<section>
+  <h2>printf address</h2>
+  <pre><code class="language-c" data-trim data-noescape>
+      #include &lt;stdio.h&gt;
+      #include &lt;stdlib.h&gt;
+      #include &lt;stdint.h&gt;
+      int global_x = 1234;
+      int global_y = 5678;
+      
+      int my_add(int arg_x, int arg_y, int layer)
+      {
+        int stack_z = 0;
+      
+        printf("Address of arg_x: %p (hex), %llu (decimal)\n", 
+        (void *)&arg_x, (unsigned long long)(uintptr_t)&arg_x);
+        printf("Address of arg_y: %p (hex), %llu (decimal)\n", 
+        (void *)&arg_y, (unsigned long long)(uintptr_t)&arg_y);
+        printf("Address of stack_z: %p (hex), %llu (decimal)\n", 
+        (void *)&stack_z, (unsigned long long)(uintptr_t)&stack_z);
+      
+        stack_z = arg_x + arg_y;
+        return stack_z;
+      }
+      
+      
+      int main()
+      {
+      
+        printf("Address of main: %p (hex), %llu (decimal)\n", 
+        (void *)main, (unsigned long long)(uintptr_t)main);
+        printf("Address of my_add: %p (hex), %llu (decimal)\n", 
+        (void *)my_add, (unsigned long long)(uintptr_t)my_add);
+        printf("\n");
+      
+        printf("Address of global_x: %p (hex), %llu (decimal)\n", 
+        (void *)&global_x, (unsigned long long)(uintptr_t)&global_x);
+        printf("Address of global_y: %p (hex), %llu (decimal)\n", 
+        (void *)&global_y, (unsigned long long)(uintptr_t)&global_y);
+        printf("\n");
+      
+      
+        int main_x = global_x;
+        int main_y = global_y;
+        int main_z = 0; 
+      
+        printf("Address of main_x: %p (hex), %llu (decimal)\n", 
+        (void *)&main_x, (unsigned long long)(uintptr_t)&main_x);
+        printf("Address of main_y: %p (hex), %llu (decimal)\n", 
+        (void *)&main_y, (unsigned long long)(uintptr_t)&main_y);
+        printf("Address of main_z: %p (hex), %llu (decimal)\n", 
+        (void *)&main_z, (unsigned long long)(uintptr_t)&main_z);
+      
+        main_z  = my_add(main_x, main_y, 1);
+        printf("\n");
+      
+        int* heap_pointer_1 = malloc(sizeof(int));
+        int* heap_pointer_2 = malloc(sizeof(int));
+        int* heap_pointer_3 = malloc(sizeof(int));
+      
+        printf("Address of heap_pointer_1: %p (hex), %llu (decimal)\n", 
+        (void *)heap_pointer_1, (unsigned long long)(uintptr_t)heap_pointer_1);
+        printf("Address of heap_pointer_2: %p (hex), %llu (decimal)\n", 
+        (void *)heap_pointer_2, (unsigned long long)(uintptr_t)heap_pointer_2);
+        printf("Address of heap_pointer_3: %p (hex), %llu (decimal)\n", 
+        (void *)heap_pointer_3, (unsigned long long)(uintptr_t)heap_pointer_3);
+      
+        free(heap_pointer_1);
+        free(heap_pointer_2);
+        free(heap_pointer_3);
+      
+        return 0;
+      }
+      
+    </code></pre>
+
+</section>
+
+
+<section>
+  <h2>addresses</h2>
+  <pre><code class="language-c" data-trim data-noescape>
+    Address of main: 0x8048533 (hex), 134513971 (decimal)
+    Address of my_add: 0x80484ad (hex), 134513837 (decimal)
+    
+    Address of global_x: 0x804a02c (hex), 134520876 (decimal)
+    Address of global_y: 0x804a030 (hex), 134520880 (decimal)
+    
+    Address of main_x: 0xbfdc40f8 (hex), 3218882808 (decimal)
+    Address of main_y: 0xbfdc40fc (hex), 3218882812 (decimal)
+    Address of main_z: 0xbfdc4100 (hex), 3218882816 (decimal)
+    Address of arg_x: 0xbfdc40e0 (hex), 3218882784 (decimal)
+    Address of arg_y: 0xbfdc40e4 (hex), 3218882788 (decimal)
+    Address of stack_z: 0xbfdc40cc (hex), 3218882764 (decimal)
+    
+    Address of heap_pointer_1: 0x8454008 (hex), 138756104 (decimal)
+    Address of heap_pointer_2: 0x8454018 (hex), 138756120 (decimal)
+    Address of heap_pointer_3: 0x8454028 (hex), 138756136 (decimal)
+    </code></pre>
+
+</section>
+    
+<section>
+  <h2>code</h2>
+  <pre><code class="language-c" data-trim data-noescape>
+      int my_add(int arg_x, int arg_y, int layer){}
+      int main(){}
+
+      Address of main: 0x8048533 (hex), 134513971 (decimal)
+      Address of my_add: 0x80484ad (hex), 134513837 (decimal)
+    </code></pre>
+
+</section>
+
+<section>
+  <h2>data</h2>
+  <pre><code class="language-c" data-trim data-noescape>
+      int global_x = 1234;
+      int global_y = 5678;
+     
+      Address of global_x: 0x804a02c (hex), 134520876 (decimal)
+      Address of global_y: 0x804a030 (hex), 134520880 (decimal)     
+    </code></pre>
+
+</section>
+
+
+
+
+<section>
+  <h2>heap</h2>
+  <pre><code class="language-c" data-trim data-noescape>
+    int* heap_pointer_1 = malloc(sizeof(int));
+    int* heap_pointer_2 = malloc(sizeof(int));
+    int* heap_pointer_3 = malloc(sizeof(int));
+    free(heap_pointer_1);
+    free(heap_pointer_2);
+    free(heap_pointer_3);
+
+    Address of heap_pointer_1: 0x8454008 (hex), 138756104 (decimal)
+    Address of heap_pointer_2: 0x8454018 (hex), 138756120 (decimal)
+    Address of heap_pointer_3: 0x8454028 (hex), 138756136 (decimal)
+    </code></pre>
+
+    <ul class="fragment fade-in">
+      <li>Heap grows upward!</li>
+      </ul>
+</section>
+
+
+<section>
+  <h2>Stack</h2>
+  <pre><code class="language-c" data-trim data-noescape>
+      int my_add(int arg_x, int arg_y, int layer)
+      {
+        int stack_z = 0;
+        stack_z = arg_x + arg_y;
+        return stack_z;
+      }
+      int main()
+      {
+        int main_x = global_x;
+        int main_y = global_y;
+        int main_z = 0; 
+        main_z  = my_add(main_x, main_y, 1);
+      }
+
+      Address of main_x: 0xbfdc40f8 (hex), 3218882808 (decimal)
+      Address of main_y: 0xbfdc40fc (hex), 3218882812 (decimal)
+      Address of main_z: 0xbfdc4100 (hex), 3218882816 (decimal)
+      Address of arg_x: 0xbfdc40e0 (hex), 3218882784 (decimal)
+      Address of arg_y: 0xbfdc40e4 (hex), 3218882788 (decimal)
+      Address of stack_z: 0xbfdc40cc (hex), 3218882764 (decimal)
+    </code></pre>
+</section>
+
+<section>
+  <h2>Stack direction</h2>
+  <pre><code class="language-c" data-trim data-noescape>
+      Address of main_x: 0xbfdc40f8 (hex), 3218882808 (decimal)
+      Address of main_y: 0xbfdc40fc (hex), 3218882812 (decimal)
+      Address of main_z: 0xbfdc4100 (hex), 3218882816 (decimal)
+     
+      Address of arg_x: 0xbfdc40e0 (hex), 3218882784 (decimal)
+      Address of arg_y: 0xbfdc40e4 (hex), 3218882788 (decimal)
+      Address of stack_z: 0xbfdc40cc (hex), 3218882764 (decimal)
+
+      In the stack frame of main: 3218882816->3218882808
+      In the stack frame of myadd: 3218882784->3218882764
+    </code></pre>
+
+    <ul class="fragment fade-in">
+      <li>Stack grows downward!</li>
+      </ul>
+</section>
+
+<section>
+  <h2>Positions?</h2>
+  <pre><code class="language-text" data-trim>
+
++----------------------+  <- 3GB (0xC0000000)
+|     Stack Segment    |  <- 0xbfdc4100
+| (Function Calls)     |  <- Grows Down
++----------------------+
+|                      |
+|                      |
+|     Heap Segment     |
+| (Dynamic Memory)     |  <- Grows Up
++----------------------+  <- 0x8454008
+|      Data Segment    |
+| (Global Variables)   |
++----------------------+  <- 0x0804a02c
+|      Code Segment    |
+|  (Executable Code)   |
++----------------------+  <- 0x080484ad
+|                      |  
++----------------------+  <- 0GB (0x00000000)
+  </code></pre>
+
+</section>
+
+
+<section>
+  <h2>32bit->4GB: OS vs. User Space</h2>
+  <pre><code class="language-text" data-trim>
++----------------------+ <- 4GB (0xFFFFFFFF)
+|   Kernel Space (OS)  |  
+|                      |
+|                      |
+|                      |
++----------------------+  <- 3GB (0xC0000000)
+|   User Space (Apps)  |  
+|                      |
+|                      |
+|                      |
+|                      |
+|                      |  
++----------------------+ <- 0GB (0x00000000)
+  </code></pre>
+  <p>Linux reserves the top 1GB (3GB-4GB) for the OS, leaving 0-3GB for user processes.</p>
+</section>
+
+
+<section>
+  <h2>32bit Linux Virtual Address Space</h2>
+  <pre><code class="language-text" data-trim>
++----------------------+ <- 4GB (0xFFFFFFFF)
+|   Kernel Space (OS)  |  
+|                      |
+|                      |
++----------------------+  <- 3GB (0xC0000000)
+|     Stack Segment    |  <- Grows Down
+| (Function Calls)     |
++----------------------+
+|                      |
+|                      |
+|     Heap Segment     |
+| (Dynamic Memory)     |  <- Grows Up
++----------------------+
+|      Data Segment    |
+| (Global Variables)   |
++----------------------+
+|      Code Segment    |
+|  (Executable Code)   |
++----------------------+
+|                      |  
++----------------------+  <- 0GB (0x00000000)
+  </code></pre>
+
+</section>
+
+<section>
+  <h2>Virtual address space</h2>
+  <ul>
+    <li class="fragment fade-in">Windows 32bit: 2GB/2GB</li>
+    <li class="fragment fade-in">Linux x86-64 48bit: 128TB/128TB</li>
+    <li class="fragment fade-in">0x0000000000000000 → 0x00007FFFFFFFFFFF</li>
+    <li class="fragment fade-in">Example: Address of main_x: 0x7fffd32b5b84</li>
+  </ul>
+</section>
+
+
+
+<section>
+
+  <div style="display: flex; justify-content: center; align-items: center; gap: 50px;">
+
+    <!-- User Space Box -->
+    <div style="
+      width: 40%;
+      height: 450px;
+      border: 2px solid black;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      font-family: monospace;
+      padding: 10px;
+      text-align: center;
+      background-color: #f9f9f9;">
+      <pre style="text-align: left; margin: 0 auto;">
++----------------------+ <-4GB
+|     Stack Segment    |
+|   (Function Calls)   |
++----------------------+
+|                      |
+|                      |
+|     Heap Segment     |
+|   (Dynamic Memory)   |
++----------------------+
+|      Data Segment    |
+|  (Global Variables)  |
++----------------------+
+|      Code Segment    |
+|  (Executable Code)   |
++----------------------+
+|                      |
++----------------------+ <-0GB
+      </pre>
+    </div>
+
+    <!-- Kernel Space Box -->
+    <div style="
+      width: 40%;
+      height: 450px;
+      border: 2px solid black;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      font-family: monospace;
+      padding: 10px;
+      text-align: center;
+      background-color: #f9f9f9;">
+
+      <pre style="text-align: left; margin: 0 auto;">
++----------------------+ <-4GB
+|                      |
+|                      |
+|                      |
+|                      |
+|                      |
+|    Kernel Code       |
+|    Kernel Data       |
+|  Device Drivers      |
+| Memory Management    |
+|   System Calls       |
+|                      |
+|                      |  
+|                      |
+|                      |
+|                      |
++----------------------+ <-0GB
+
+      </pre>
+    </div>
+
+  </div>
+  <p style="text-align: center;">User and Kernel have **separate** virtual address spaces (0-4GB each), requiring page table switching.</p>
+</section>
+
+
+<section>
+  <h2>Stack vs Heap</h2>
+  <pre><code class="language-text" data-trim>
+
++----------------------+  <- Grows Down
+|     Stack Segment    |  
+| (Function Calls)     |  
++----------------------+
+|                      |
+|                      |
+|     Heap Segment     |
+| (Dynamic Memory)     |  
++----------------------+  <- Grows Up
+
+  </code></pre>
+
+</section>
+
+<section>
+  <h2>Guard page</h2>
+  <pre><code class="language-text" data-trim>
+
++----------------------+  <- Grows Down
+|     Stack Segment    |  
+| (Function Calls)     |
++----------------------+
+|xxxxxxxxxxxxxxxxxxxxxx|  (a guard page: Unmapped, triggers page fault )
++----------------------+
+|                      |
+|                      |
+|     Heap Segment     |
+| (Dynamic Memory)     |  
++----------------------+  <- Grows Up
+
+  </code></pre>
+
+</section>
+
+
+<section>
+  <h2>Why guard page?</h2>
+  <ul>
+    <li class="fragment fade-in">Stack grows donwward!</li>
+    <li class="fragment fade-in">But anyway, if it touches an invalid page,</li>
+    <li class="fragment fade-in">a page fault will be generated!</li>
+    <li class="fragment fade-in">then why we need a guard page?</li>
+    <li class="fragment fade-in" style="color:red">WHAT IF it touches a valid page?</li>
+    <li class="fragment fade-in" style="color:green">stack/heap overlapping!</li>
+  </ul>
+</section>
+
+<section>
+  <h2>naive loop</h2>
+  <pre><code class="language-c" data-trim data-noescape>
+    for (int i = 0; i < size; i++) {
+      if (arr[i] == target) { 
+          return i;
+      }
+  }  
+    </code></pre>
+
+    <ul class="fragment fade-in">
+      <li>Each iteration: two comparisons</li>
+      <li>i < size</li>
+      <li>arr[i] == target</li>
+      </ul>
+</section>
+
+
+<section>
+  <h2>loop guard (Sentinel Method)</h2>
+  <pre><code class="language-c" data-trim data-noescape>
+    arr[size] = target;  
+    int i = 0;
+    while (arr[i] != target) {
+        i++;
+    }
+    return (i == size) ? -1 : i;   
+    </code></pre>
+
+    <ul class="fragment fade-in">
+      <li>Add a guard (sentinel) at the end</li>
+      <li>Sentinel ensures we always find a match</li>
+      <li>No need to check `i < size`</li>
+      <li>A single final check: if found in original array?</li>
+      </ul>
+</section>
+
+
+<section>
+  <h2>Key takeaways</h2>
+  <ul>
+    <li class="fragment fade-in">Abstration: main memory -> virtual address space.</li>
+    <li class="fragment fade-in">VM: a set of CPU/OS collobrating techniques.</li>
+    <li class="fragment fade-in">Engineering principle: benefits vs cost.</li>
+    <li class="fragment fade-in">To know it, to do it! (gcc, readelf, objdump, ...)</li>
+  </ul>
+</section>
+
+  </div>
+</div>
+
+<!-- Reveal.js from CDN -->
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.3.1/dist/reveal.js"></script>
+<script src="https://unpkg.com/reveal.js/plugin/highlight/highlight.js"></script>
+<script>
+  Reveal.initialize({
+    hash: true,
+    transition: 'fade',
+    plugins: [ RevealHighlight ] 
+  });
+</script>
+
+</body>
+</html>

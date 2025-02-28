@@ -1,0 +1,487 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Peterson’s Algorithm in Concurrency (Bright Theme)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  
+  <!-- Reveal.js CSS using the white theme -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/theme/white.min.css" id="theme">
+  
+  <!-- Highlight.js CSS using a light GitHub theme -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/github.min.css">
+  
+  <style>
+    /* Overall styling for a bright classroom presentation */
+    body {
+      background-color: #FFFFE0; /* Light yellow */
+      color: #000;
+      font-family: "Helvetica Neue", Arial, sans-serif;
+    }
+    h2 {
+      font-size: 2.2em;
+      margin-bottom: 0.3em;
+    }
+    p, li {
+      font-size: 1.2em;
+      line-height: 1.4em;
+    }
+    /* Code block styling */
+    pre code {
+      font-size: 1em;
+      line-height: 1.4;
+    }
+    /* Flex container for side-by-side code blocks */
+    .code-columns {
+      display: flex;
+      justify-content: space-around;
+      gap: 2rem;
+    }
+    .code-columns > div {
+      flex: 1;
+      text-align: left;
+    }
+    .code-columns h3 {
+      margin-bottom: 0.3em;
+      font-size: 1.5em;
+    }
+    .code-columns pre {
+      margin: 0.5em 0;
+    }
+    /* Critical section diagram styling */
+    .critical-box {
+      border: 3px dashed #d9534f;
+      padding: 1em;
+      margin: 1em auto;
+      max-width: 80%;
+      font-family: monospace;
+      background-color: #f7f7f7;
+      color: #000;
+    }
+    /* Table styling for summary */
+    table {
+      margin: 1em auto;
+      border-collapse: collapse;
+      font-size: 1.0em;
+    }
+    table, th, td {
+      border: 1px solid #555;
+      text-align: center;
+      padding: 0.5em 0.8em;
+    }
+  </style>
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+    
+      <!-- Slide 1: Title -->
+      <section data-transition="fade">
+        <h2>Peterson’s Algorithm</h2>
+        <p><em>A Stepwise Journey in Concurrency Control</em></p>
+        <!-- <p><em>Presented by Your Name</em></p> -->
+      </section>
+      
+      <!-- Slide 2: Introduction -->
+      <section data-transition="fade">
+        <h2>Introduction</h2>
+        <ul>
+          <li class="fragment">A software solution for two‑thread <span style="color:red">critical section</span>without hardware support</li>
+          <li class="fragment">Ensures <strong>mutual exclusion</strong>, <strong>progress</strong>, and <strong>bounded waiting</strong></li>
+          <li class="fragment">Demonstrates how subtle code changes affect concurrency and cause bugs</li>
+        </ul>
+      </section>
+      
+
+      
+      <!-- Slide 4: System Configuration & Critical Section -->
+      <section data-transition="fade">
+        <h2>Critical Section</h2>
+
+        <div class="critical-box fragment">
+          Critical Section<br>
+          ┌─────────────────────┐<br>
+          │ Shared Resource(s)  │<br>
+          └─────────────────────┘
+        </div>
+        <p class="fragment">
+          Protection is required whenever a thread enters this box.
+        </p>
+      </section>
+      
+      <!-- Slide 5: Critical Section Example -->
+      <section data-transition="fade">
+        <h3>Example: Account Transfer</h2>
+        <div class="code-columns fragment">
+          <div>
+            <h4>Before Transfer</h3>
+            <pre><code class="language-cpp">
+// Shared bank accounts
+int src = 1000;
+int dst = 500;
+            </code></pre>
+          </div>
+          <div>
+            <h4>Critical Section</h3>
+            <pre><code class="language-cpp">
+/* Critical Section:
+   Transfer $100 from src to dst */
+pthread_mutex_lock(&lock);
+src -= 100;
+dst += 100;
+pthread_mutex_unlock(&lock);
+            </code></pre>
+          </div>
+        </div>
+        <p class="fragment">
+          Without proper synchronization, concurrent transfers could lead to incorrect balances.
+        </p>
+      </section>
+      
+
+      <!-- Slide 7: Key Requirements -->
+      <section data-transition="fade">
+        <h2>Key Requirements</h2>
+        <ul>
+          <li class="fragment"><strong>Mutual Exclusion:</strong> Only one thread in the critical section at a time.</li>
+          <li class="fragment"><strong>Progress:</strong> A waiting thread eventually enters if no thread is in the critical section.</li>
+          <li class="fragment"><strong>Bounded Waiting:</strong> Every thread gets a turn within a finite number of attempts.</li>
+        </ul>
+      </section>
+      
+	        <!-- Slide 3: Atomic Instructions -->
+      <section data-transition="fade">
+        <h2>Atomic Instructions</h2>
+        <p class="fragment">
+          In practice, synchronization is often implemented using hardware atomic instructions,
+          such as <strong>test‑and‑set</strong> or <strong>compare‑and‑swap</strong>.
+        </p>
+        <p class="fragment">
+          These operations guarantee that updates to variables occur atomically.
+        </p>
+        <p class="fragment">
+          <em>Here, however, we focus on a software‑only solution.</em>
+        </p>
+      </section>
+	  
+	  
+      <!-- Slide 8: Step 1 – No Mutual Exclusion -->
+      <section data-transition="fade">
+        <h2>Step 1: No Mutual Exclusion</h2>
+        <div class="code-columns fragment">
+          <div>
+            <h4>Thread 0</h3>
+            <pre><code class="language-cpp">
+// Thread 0
+{
+    // critical section (no synchronization)
+	src -= 100;
+	dst += 100;
+}
+            </code></pre>
+          </div>
+          <div>
+            <h4>Thread 1</h3>
+            <pre><code class="language-cpp">
+// Thread 1
+{
+    // critical section (no synchronization)
+	src -= 100;
+	dst += 100;
+}
+            </code></pre>
+          </div>
+        </div>
+        <ul>
+          <li class="fragment"><strong>Error:</strong> Both threads may enter the critical section simultaneously.</li>
+          <li class="fragment"><strong>Bug:</strong> Violates mutual exclusion.</li>
+        </ul>
+      </section>
+      
+      <!-- Slide 9: Step 2 – Using Only flag[] -->
+      <section data-transition="fade">
+        <h3>Step 2: Using <code>flag[]</code></h3>
+		<h6 style="color:red" class="fragment">boolean flag[2] = {false, false};</h6>
+		
+        <div class="code-columns fragment">
+          <div>
+            <pre><code class="language-cpp">
+/* Thread 0 */
+{
+    flag[0] = true;
+    while (flag[1]) {
+      // busy wait
+    }
+    // critical section
+    flag[0] = false;
+}
+            </code></pre>
+          </div>
+          <div>
+            <pre><code class="language-cpp">
+/* Thread 1 */
+{
+    flag[1] = true;
+    while (flag[0]) {
+      // busy wait
+    }
+    // critical section
+    flag[1] = false;
+}
+            </code></pre>
+          </div>
+        </div>
+        <ul>
+          <li class="fragment"><strong>Error:</strong> Both threads wait forever.</li>
+          <li class="fragment"><strong>Bug:</strong> Deadlock (loss of progress).</li>
+        </ul>
+      </section>
+      
+      <!-- Slide 10: Step 3 – Using Only turn (Self‑Assignment) -->
+      <section data-transition="fade">
+        <h4>Step 3: Using <code>turn</code></h2>
+		<p style="color:red" class="fragment">int turn = 0;</p>
+        <div class="code-columns fragment">
+          <div>
+            <pre><code class="language-cpp">
+/* Thread 0 */
+{
+    turn = 0;
+    while (turn != 0) { /* busy wait */ }
+    // critical section
+}
+            </code></pre>
+          </div>
+          <div>
+            <pre><code class="language-cpp">
+/* Thread 1 */
+{
+    turn = 1;
+    while (turn != 1) { /* busy wait */ }
+    // critical section
+}
+            </code></pre>
+          </div>
+        </div>
+    <h4 class="fragment" style="text-transform: none;">  <strong>Error:</strong> One thread may always "win" the final write to <code>turn</code>.</h4>
+	
+    <h4 class="fragment" style="text-transform: none;">   <strong>Bug:</strong> Starvation (violates bounded waiting). </h4>
+    
+
+      </section>
+      
+  
+      
+      <!-- Slide 12: Step 5 – Using Both flag[] and turn (Self‑Favoring) -->
+      <section data-transition="fade">
+        <h4>Step 4: Using Both <code>flag[]</code> + <code>turn</code></h4>
+		<pre><code class="language-cpp">
+		boolean flag[2] = {false, false};
+		int turn = 0;
+		</code></pre>
+		<div class="code-columns fragment">
+          <div>
+            <pre><code class="language-cpp">
+/* Thread 0 */
+{
+    flag[0] = true;
+    turn = 0;  // favor self
+    while (flag[1] && turn == 1) {
+      // busy wait
+    }
+    // critical section
+    flag[0] = false;
+}
+            </code></pre>
+          </div>
+          <div>
+            <pre><code class="language-cpp">
+/* Thread 1 */
+{
+    flag[1] = true;
+    turn = 1;  // favor self
+    while (flag[0] && turn == 0) {
+      // busy wait
+    }
+    // critical section
+    flag[1] = false;
+}
+            </code></pre>
+          </div>
+        </div>
+      </section>
+      
+	    <section data-transition="fade">
+        <h4>Unfair!</h4>
+	          <div>
+            <pre><code class="language-cpp">
+/* Thread 1 */
+{
+    flag[1] = true;
+    turn = 1;  // favor self
+    while (flag[0] && turn == 0) {
+      // busy wait
+    }
+}
+            </code></pre>	
+			
+		<ul>
+          <li class="fragment"><strong>Error:</strong> One thread may continually win, starving the other.</li>
+          <li class="fragment"><strong>Bug:</strong> Unfair; bounded waiting is violated.</li>
+        </ul>
+      </section>
+	  
+      <!-- Slide 13: Step 6 – Correct Peterson’s Algorithm -->
+      <section data-transition="fade">
+        <h4>Step 5: Peterson’s Algorithm</h4>
+		<pre><code class="language-cpp">
+		boolean flag[2] = {false, false};
+		int turn = 0;
+		</code></pre>
+        <div class="code-columns fragment">
+          <div>
+            <pre><code class="language-cpp">
+/* Thread 0 */
+{
+    flag[0] = true;   // indicate interest
+    turn = 1;         // defer to Thread 1
+    while (flag[1] && turn == 1) {
+      // busy wait
+    }
+    // critical section
+    flag[0] = false;
+}
+            </code></pre>
+          </div>
+          <div>
+            <pre><code class="language-cpp">
+/* Thread 1 */
+{
+    flag[1] = true;   // indicate interest
+    turn = 0;         // defer to Thread 0
+    while (flag[0] && turn == 0) {
+      // busy wait
+    }
+    // critical section
+    flag[1] = false;
+}
+            </code></pre>
+          </div>
+        </div>
+        <ul>
+          <li class="fragment"><strong>Success:</strong> Achieves mutual exclusion, progress, and bounded waiting.</li>
+        </ul>
+      </section>
+      
+      <!-- Slide 14: Step 7 – Breaking It with OR -->
+      <section data-transition="fade">
+        <h4>Step 6: Breaking It with a Tiny Tweak</h4>
+
+
+            <pre><code class="language-cpp">
+// Instead of:
+while (flag[1] && turn == 1) { ... }
+// Use:
+while (flag[1] || turn == 1) { ... }
+            </code></pre>
+
+
+        <ul>
+          <li class="fragment"><strong>Error:</strong> With the OR, if both threads are interested, condition remains true forever.</li>
+          <li class="fragment"><strong>Bug:</strong> Deadlock—no thread enters the critical section.</li>
+        </ul>
+      </section>
+      
+      <!-- Slide 15: Summary of Flaws -->
+      <section data-transition="fade">
+        <h2>Summary of Flaws</h2>
+        <ul>
+          <li class="fragment"><strong>No sync:</strong> Violates mutual exclusion.</li>
+          <li class="fragment"><strong>Only flag[]:</strong> Deadlock (no progress).</li>
+          <li class="fragment"><strong>Only turn (self‑assignment):</strong> Starvation (bounded waiting violated).</li>
+          <li class="fragment"><strong>flag[] + turn (self‑assignment)</strong> Unfair; one thread may always win.</li>
+          <li class="fragment"><strong>flag[] + turn (other‑assignment)</strong> Correct synchronization.</li>
+        </ul>
+      </section>
+
+      <!-- NEW Slide: Summary Table -->
+      <section data-transition="fade">
+        <h4>Comparison Table</h4>
+        <table class="fragment">
+          <thead>
+            <tr>
+              <th>Approach</th>
+              <th>Mutual Exclusion</th>
+              <th>Progress</th>
+              <th>Bounded Waiting</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>No Sync</td>
+              <td>✗</td>
+              <td>meaningless</td>
+              <td>N/A</td>
+            </tr>
+            <tr>
+              <td><code>flag[]</code></td>
+              <td>✓</td>
+              <td>✗(Deadlock)</td>
+              <td>N/A</td>
+            </tr>
+            <tr>
+              <td><code>turn</code> (Self)</td>
+              <td>✓</td>
+              <td>✓</td>
+              <td>✗(Starvation)</td>
+            </tr>
+            <tr>
+              <td><code>flag[]</code> + <code>turn(Self)</code></td>
+              <td>✓</td>
+              <td>✓</td>
+              <td>✗(Starvation)</td>
+            </tr>
+            <tr>
+              <td><code>flag[]</code> + <code>turn(Other)</code> (Peterson’s)</td>
+              <td>✓</td>
+              <td>✓</td>
+              <td>✓</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+      
+      <!-- Slide 16: Conclusion & Q&A -->
+      <section data-transition="fade">
+        <h2>Conclusion</h2>
+        <p class="fragment">
+          Even minor code modifications can have a dramatic impact on concurrency.
+        </p>
+        <p class="fragment">
+          More practice is needed!
+        </p>
+      </section>
+      
+    </div>
+  </div>
+  
+  <!-- Reveal.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.min.js"></script>
+  <!-- Reveal.js Highlight Plugin -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/plugin/highlight/highlight.min.js"></script>
+  <script>
+    Reveal.initialize({
+      controls: false,   // Use keyboard navigation only
+      progress: true,
+      slideNumber: true,
+      history: true,
+      center: true,
+      transition: 'fade',
+      transitionSpeed: 'fast',
+      plugins: [ RevealHighlight ]
+    });
+  </script>
+</body>
+</html>
+

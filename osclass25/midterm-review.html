@@ -1,0 +1,564 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Midterm Review</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  
+  <!-- Reveal.js CSS using the white theme -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/theme/white.min.css" id="theme">
+  
+  <!-- Highlight.js CSS using a light GitHub theme -->
+  <!-- Monokai Sublime theme -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/monokai-sublime.min.css">
+
+  
+  <style>
+    /* Overall styling for a bright classroom presentation */
+    body {
+      background-color: #FFFFE0; /* Light yellow */
+      color: #000;
+      font-family: "Helvetica Neue", Arial, sans-serif;
+    }
+    h2 {
+      font-size: 2.2em;
+      margin-bottom: 0.3em;
+    }
+    p, li {
+      font-size: 1.2em;
+      line-height: 1.4em;
+    }
+    /* Code block styling */
+    pre code {
+      font-size: 1em;
+      line-height: 1.4;
+    }
+    /* Flex container for side-by-side code blocks */
+    .code-columns {
+      display: flex;
+      justify-content: space-around;
+      gap: 2rem;
+    }
+    .code-columns > div {
+      flex: 1;
+      text-align: left;
+    }
+    .code-columns h3 {
+      margin-bottom: 0.3em;
+      font-size: 1.5em;
+    }
+    .code-columns pre {
+      margin: 0.5em 0;
+    }
+    /* Critical section diagram styling */
+    .critical-box {
+      border: 3px dashed #d9534f;
+      padding: 1em;
+      margin: 1em auto;
+      max-width: 80%;
+      font-family: monospace;
+      background-color: #f7f7f7;
+      color: #000;
+    }
+    /* Table styling for summary */
+    table {
+      margin: 1em auto;
+      border-collapse: collapse;
+      font-size: 1.0em;
+    }
+    table, th, td {
+      border: 1px solid #555;
+      text-align: center;
+      padding: 0.5em 0.8em;
+    }
+  </style>
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+    
+      <!-- Slide 1: Title -->
+      <section data-transition="fade">
+        <h2>Midterm Review</h2>
+        <p><em>Operating Systems: Three Easy Pieces</em></p>
+        <p><em>Virtualization: Chapters 3-24</em></p>
+        <!-- <p><em>Presented by Your Name</em></p> -->
+      </section>
+      
+      <!-- Slide 2: Introduction -->
+      <section data-transition="fade">
+        <h2>Operating System</h2>
+        <ul>
+          <li class="fragment">An operating system (OS) is system software that manages computer hardware and software resources, and provides common services for computer programs.</li>
+          
+          <li class="fragment">Can a program run on hardware directly?</li>
+          <li class="fragment"><span style="color:RED">Yes</style>: bare-metal programming! </li>
+        </ul>
+      </section>
+      
+      <section data-transition="fade">
+        <h2>Process</h2>
+        <ul>
+          <li class="fragment">A process is the instance of a computer program that is being executed by one or many threads. </li>
+          
+          <li class="fragment">Executable code, virtual memory space, file descriptors</li>
+          <li class="fragment">Processor state <span style="color:red">(context)</span></li>
+        </ul>
+      </section>
+      
+      <section data-transition="fade">
+        <h2>To execute a program</h2>
+        <ul>
+          <li class="fragment">fork(): Creating a new process by duplicating the calling process</li>
+          <li class="fragment">exec(): Executing a new program by loading the program file</li>
+          <li class="fragment">Windows <span style="color:red">CreateProcess()</span>: does both in a single step!</li>
+        </ul>
+      </section>
+
+      <section data-transition="fade">
+        <h4>Process Parent-Child</h4>
+
+
+            <pre><code class="language-cpp">
+              int num = 3;
+              int main(int argc, char**argv){
+                  printf("start num is %d\n", num);     
+                  num++;
+                  int rc = fork();
+                  if(rc>0){
+                      num+=5;
+                      printf("Parent's num is %d\n", num);
+                  }
+                  else if(rc==0)
+                  {
+                      num+=3;
+                      printf("Child's num is %d\n", num);
+                  }
+                  num--;
+                  printf("end num is %d\n", num);
+              } 
+            </code></pre>
+
+
+        <ul>
+          <li class="fragment">inside a process?</li>
+          <li class="fragment">parent-child interleaving?</li>
+        </ul>
+      </section>
+
+      <section data-transition="fade">
+        <h2>Limited Direct Execution</h2>
+        <ul>
+          <li class="fragment">restricted operations</li>
+          <li class="fragment">user/kernel dual-mode</li>
+          <li class="fragment">system call: using a special instruction to trap CPU from user mode to kernel mode</li>
+          <li class="fragment">must rely on hardware supports</li>
+        </ul>
+      </section>   
+      
+      <section data-transition="fade">
+        <h2>Process Scheduling Policies</h2>
+        <ul>
+          <li class="fragment">turnaround time: arrival->completion</li>
+          <li class="fragment">scheduling policies:</li>
+          <p>
+          <li class="fragment">First Come First Served (FCFS)</li>
+          <li class="fragment">Shortest Job First (SJF)</li>
+          <li class="fragment">Shortest Time to Completion First (STCF)</li>
+          <li class="fragment">Round Robin Scheduling (RR)</li>
+        </ul>
+      </section> 
+
+      <section data-transition="fade">
+        <h2>Memory</h2>
+        <ul>
+          <li class="fragment">Code</li>
+          <li class="fragment">Data</li>
+          <li class="fragment">Stack</li>
+          <li class="fragment">Heap: Malloc() + free()</li>
+        </ul>
+      </section>   
+
+
+      <section data-transition="fade">
+        <h4>Stack bugs: 1</h4>
+
+
+            <pre><code class="language-cpp">
+              int *addPoints(int *point1, int *point2)
+              {
+                  int ret[2];
+                  ret[0] = point1[0] + point2[0];
+                  ret[1] = point1[1] + point2[1];
+                  return ret;
+              }
+              int main(int argc, char**argv)
+              {
+                  int x[2] = {0, 2};
+                  int y[2] = {3, 2};
+                  int *z = addPoints(x, y);
+              }
+            </code></pre>
+          </section>  
+
+          <section data-transition="fade">
+            <h4>Stack bugs: 2</h4>
+    
+    
+                <pre><code class="language-cpp">
+                  int *addPoints(int *point1, int *point2)
+                  {
+                      int ret[2];
+                      ret[0] = point1[0] + point2[0];
+                      ret[1] = point1[1] + point2[1];
+                      return ret;
+                  }
+                  int main(int argc, char**argv)
+                  {
+                      int x[2] = {0, 2};
+                      int y[2] = {3, 2};
+                      int *z = addPoints(x, y);
+                      free(z);
+                  }
+                </code></pre>
+              </section>  
+
+              <section data-transition="fade">
+                <h4>Heap bug 1: malloc+free</h4>
+        
+        
+                    <pre><code class="language-cpp">
+int *addPoints(int *point1, int *point2)
+{
+    int *ret = malloc(sizeof(int)*2);
+    ret[0] = point1[0] + point2[0];
+    ret[1] = point1[1] + point2[1];
+    return ret;
+}
+int main(int argc, char**argv){
+    int x[2] = {0, 2};
+    int y[2] = {3, 2};
+    int *z = addPoints(x, y);
+}
+                    </code></pre>
+                  </section> 
+
+                  <section data-transition="fade">
+                    <h4>Heap bug 2: malloc+free</h4>
+            
+            
+                        <pre><code class="language-cpp">
+
+
+int main(int argc, char**argv)
+{
+    char *str = malloc(sizeof(char)*3);
+    memcpy(str, "abc", 3);
+    printf("%s\n", str);
+}
+                        </code></pre>
+                      </section> 
+
+                      <section data-transition="fade">
+                        <h4>Heap bug 3: malloc+memcpy</h4>
+                
+                
+                            <pre><code class="language-cpp">
+    
+    
+    int main(int argc, char**argv)
+    {
+        char *str = malloc(sizeof(char)*3);
+        memcpy(str, "abc", 3);
+        printf("%s\n", str);
+        free(str);
+    }
+                            </code></pre>
+                          </section> 
+
+                          <section data-transition="fade">
+                            <h4>Heap bug 4: malloc+memcpy</h4>
+                    
+                    
+                                <pre><code class="language-cpp">
+        
+        
+        int main(int argc, char**argv)
+        {
+            char *str = malloc(sizeof(char)*4);
+            memcpy(str, "abc", 3);
+            printf("%s\n", str);
+            free(str);
+        }
+                                </code></pre>
+                              </section>
+
+                              <section data-transition="fade">
+                                <h4>strlen</h4>
+                        
+                        
+                                    <pre><code class="language-cpp">
+            
+            
+                char *str = "000";
+                strlen(str) ?
+            }
+                                    </code></pre>
+                                  </section>
+
+                  <section data-transition="fade">
+                    <h2>Free space management</h2>
+                    <ul>
+                      <li class="fragment">Maintain a free space list.</li>
+                      <p>
+                      <li class="fragment"><span style="color:red">First-Fit</span>: Allocate the <span style="color: red;">first</span> block that fits the request.</li>
+                      <li class="fragment"><span style="color:blue">Best-Fit</span>: Allocate the <span style="color:blue">smallest</span> block that fits the request.</li>
+                      <li class="fragment"><span style="color:#824fd9">Worst-Fit</span>: Allocate the <span style="color:#824fd9">largest</span> block that fits the request.</li>
+
+                    </ul>
+                  </section>  
+
+
+
+
+
+      <section data-transition="fade">
+        <h2>Virtual Memory</h2>
+        <ul>
+          <li class="fragment">process: address space</li>
+          <li class="fragment">address translation: virtual -> physical</li>
+          <li class="fragment">Need hardware supports</li>
+          <li class="fragment">Implementations: segmentation vs page</li>
+        </ul>
+      </section>   
+
+      <section data-transition="fade">
+        <h2>Page-based virtual memory</h2>
+        <ul>
+          <li class="fragment">Virtual/Physical address: <span style="color:red">(Page #) + Offset</span></li>
+        </ul>
+        <div class="diagram fragment fade-in">
+          <pre>
+  (Virtual Page #) + Offset
+         |
+      Page Table
+         |
+  (Physical Page #) + Offset
+          </pre>
+        </div>
+      </section>      
+
+      <section data-transition="fade">
+        <h2>Page Table Size</h2>
+        <ul>
+          <li class="fragment">N: Number of page table entries</li>
+          <li class="fragment">S: Size of each page table entry</li>
+          <li class="fragment">Page Table Size = N x S</li>
+          <p>
+          <li class="fragment">How to calcualte N?</li>
+          <li class="fragment">How many bits are used for page numbers?</li>
+          <li class="fragment">How many bits are used for offsets?</li>
+        </ul>
+      </section> 
+
+
+
+      <section data-transition="fade">
+        <h2>To accelerate address translation</h2>
+        <ul>
+          <li class="fragment">A translation lookaside buffer (TLB) is a <span style="color:red">hardware cache</span> that stores the recent translations of virtual memory to physical memory.</li>
+          <li class="fragment">Where is it?</li>
+          <li class="fragment">It is <strong>NOT</strong> a part of the main memory!</li>
+          <li class="fragment">It is inside the CPU!</li>
+        </ul>
+      </section> 
+
+      <section data-transition="fade">
+        <h2>Multi-level page table</h2>
+        <ul>
+          <li class="fragment">Problem: page table too large!</li>
+          <li class="fragment">Opportunity: many entries are not used.</li>
+          <li class="fragment">Solution: a page number has multiple indexing levels.</li>
+          <li class="fragment">Example: 32bit address -> [10-10-12], instead of [20-12].</li>
+          <li class="fragment">10: first level index, 10: second level index, 12: offset.</li>
+        </ul>
+      </section> 
+
+      <section data-transition="fade">
+        <h2>Bit partitioning pattern</h2>
+        <ul>
+          <li class="fragment">Real CPUs: hardware-specified</li>
+          <li class="fragment">Imagined CPUs: Let's do exercises!</li>
+          <p>
+          <li class="fragment">A computer system with a 16-bit virtual address space employs a two-level page table for address translation. 
+            In this system, the page number is represented using 8 bits, and each page table entry (PTE) occupies 4 bytes.</li>
+        </ul>
+      </section> 
+
+      <section data-transition="fade">
+        <h2>An exercise</h2>
+        <ul>
+          <li class="fragment">16-bit virtual address space</li>
+          <li class="fragment">a two-level page table</li>
+          <li class="fragment">page number is represented using 8 bits</li>
+          <p>
+          <li class="fragment">each page table entry occupies 4 bytes</li>
+        </ul>
+      </section> 
+
+      <section data-transition="fade">
+        <h2>page size?</h2>
+        <ul>
+          <li class="fragment">16-bit virtual address space</li>
+          <li class="fragment">page number is represented using 8 bits</li>
+          <p>
+          <li class="fragment">offset: 16-8 = 8</li>
+          <li class="fragment">page size: 2^8 = 256 bytes.</li>
+        </ul>
+      </section> 
+
+      <section data-transition="fade">
+        <h2>page capacity for page table entries?</h2>
+        <ul>
+          <li class="fragment">page size: 2^8 = 256 bytes.</li>
+          <li class="fragment">each page table entry occupies 4 bytes</li>
+          <p>
+          <li class="fragment">capacity: 256 / 4 = 64!</li>
+          <li class="fragment">A page can have up to 64 page table entries!</li>
+   
+
+        </ul>
+      </section> 
+
+
+      <section data-transition="fade">
+        <h2>Bit partitioning</h2>
+        <ul>
+
+          <li class="fragment">A page has 64 entries!</li>
+          <li class="fragment">64 = 2^6!</li>
+          <li class="fragment">L2-index: 6 bits!</li>
+          <li class="fragment">L1-index:  8-6=2 bits!</li>
+
+        </ul>
+      </section> 
+
+
+      <section data-transition="fade">
+        <h2>The exercise</h2>
+        <p class="fragment"> The two-level page table uses frame 8 to store the page directory <span style="color:red">( first level index)</span>.</p>
+        <div class="fragment">
+          <table border="1">
+            <thead>
+                <tr>
+                    <th>Index</th>
+                    <th>Valid</th>
+                    <th>Frame</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>0 or 0x00</td><td>1</td><td>9 or 0x09</td></tr>
+                <tr><td>1 or 0x01</td><td>0</td><td>---</td></tr>
+                <tr><td>2 or 0x02</td><td>0</td><td>---</td></tr>
+                <tr><td>3 or 0x03</td><td>1</td><td>10 or 0x0A</td></tr>
+            </tbody>
+        </table><div>
+        <p class="fragment" style="color:red">first level index: 2 bits for 4 entries. </p>
+      </section> 
+
+      <section data-transition="fade">
+        <h2>The exercise</h2>
+        <p class="fragment">Virtual Address: 0xFF11 ? </p>
+        <p class="fragment">Bit partitioning : 2-6-8</p>
+        <p class="fragment">Bit partitioning : 1111 1111 0001 0001</p>
+        <p class="fragment">The first 2 bits: 11 -> 3</p>
+        <p class="fragment">The middle 6 bits: 11 1111 -> 63 or 0x3F</p>
+
+      </section> 
+
+      <section data-transition="fade">
+        <h2>The first 2 bits: 11 -> 3</h2>
+        <p class="fragment">uses frame 8 to store the page directory:</p>
+        <div class="fragment">
+          <table border="1">
+            <thead>
+                <tr>
+                    <th>Index</th>
+                    <th>Valid</th>
+                    <th>Frame</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>0 or 0x00</td><td>1</td><td>9 or 0x09</td></tr>
+                <tr><td>1 or 0x01</td><td>0</td><td>---</td></tr>
+                <tr><td>2 or 0x02</td><td>0</td><td>---</td></tr>
+                <tr><td>3 or 0x03</td><td>1</td><td>10 or 0x0A</td></tr>
+            </tbody>
+        </table><div>
+        <p class="fragment">Now we need go into <span style="color:red">Frame 10!</span></p>
+      </section>
+
+      <section data-transition="fade">
+        <h3>The middle 6 bits: 63 or 0x3F</h3>
+        <p class="fragment">Frame 10:</p>
+        <div class="fragment">
+          <table border="1">
+            <thead>
+                <tr>
+                    <th>Index</th>
+                    <th>Valid</th>
+                    <th>Frame</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>...</td><td>0</td><td>---</td></tr>
+                <tr><td>60 or 0x3C</td><td>0</td><td>---</td></tr>
+                <tr><td>61 or 0x3D</td><td>1</td><td>5 or 0x05</td></tr>
+                <tr><td>62 or 0x3E</td><td>1</td><td>6 or 0x06</td></tr>
+                <tr><td>63 or 0x3F</td><td>1</td><td><span style="color:red">7 or 0x07</span></td></tr>
+            </tbody>
+        </table><div>
+
+      </section>
+
+      <section data-transition="fade">
+        <h2>The exercise</h2>
+        <p class="fragment">Virtual Address: 0xFF11 ? </p>
+        <p class="fragment">Two-level page table lookup: 0xFF -> 0x07!</p>
+        <p class="fragment">Copy offset!</p>
+        <p class="fragment">Physical Address: 0x0711</p>
+
+      </section> 
+
+      <section data-transition="fade">
+        <h2>Page replacement policy</h2>
+<ul>
+        <li class="fragment"><span style="color:red">MIN/OPT</span>: removing the page that <span style="color:red">will not be used for the longest period in the future</span>.</li>
+        <li class="fragment"><span style="color:blue">FIFO</span>: removing the <span style="color:blue">oldest page</span></li>
+        <li class="fragment"><span style="color:purple">LRU</span>: removing the <span style="color:purple">least recently accessed page</span> </li>
+<ul>        
+
+      </section> 
+
+
+
+  <!-- Reveal.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.min.js"></script>
+  <!-- Reveal.js Highlight Plugin -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/plugin/highlight/highlight.min.js"></script>
+  <script>
+    Reveal.initialize({
+      controls: false,   // Use keyboard navigation only
+      progress: true,
+      slideNumber: true,
+      history: true,
+      center: true,
+      transition: 'fade',
+      transitionSpeed: 'fast',
+      plugins: [ RevealHighlight ]
+    });
+  </script>
+</body>
+</html>
+

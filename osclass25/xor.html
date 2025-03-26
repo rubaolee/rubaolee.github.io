@@ -1,0 +1,146 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>XOR Presentation</title>
+    <link rel="stylesheet" href="https://unpkg.com/reveal.js/dist/reveal.css">
+    <link rel="stylesheet" href="https://unpkg.com/reveal.js/dist/theme/black.css">
+    <style>
+      pre code {
+        font-size: 1.1em;
+        line-height: 1.5em;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="reveal">
+      <div class="slides">
+
+        <section>
+          <h1>Unlocking XOR</h1>
+          <p class="fragment">From Bits to Brilliance</p>
+        </section>
+
+        <section>
+          <h2>What is a Bit?</h2>
+          <ul>
+            <li class="fragment">A bit is the smallest unit of data</li>
+            <li class="fragment">It can be 0 (off) or 1 (on)</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2>Binary Logic</h2>
+          <ul>
+            <li class="fragment">Computers use binary operations</li>
+            <li class="fragment">Common: AND, OR, NOT, XOR</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2>What is XOR?</h2>
+          <p class="fragment">Exclusive OR: Returns 1 if inputs differ</p>
+          <table class="fragment">
+            <tr><th>A</th><th>B</th><th>A XOR B</th></tr>
+            <tr><td>0</td><td>0</td><td>0</td></tr>
+            <tr><td>0</td><td>1</td><td>1</td></tr>
+            <tr><td>1</td><td>0</td><td>1</td></tr>
+            <tr><td>1</td><td>1</td><td>0</td></tr>
+          </table>
+        </section>
+
+        <section>
+          <h2>XOR Properties</h2>
+          <ul>
+            <li class="fragment">Commutative: A ^ B = B ^ A</li>
+            <li class="fragment">Associative: A ^ (B ^ C) = (A ^ B) ^ C</li>
+            <li class="fragment">Identity: A ^ 0 = A</li>
+            <li class="fragment">Self-inverse: A ^ A = 0</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2>Bitwise XOR in Code</h2>
+          <pre class="fragment"><code>a = 5  # 0101
+b = 3  # 0011
+a ^ b  # 0110 = 6</code></pre>
+        </section>
+
+        <section>
+          <h2>XOR Swap Trick</h2>
+          <pre class="fragment"><code>a = a ^ b
+b = a ^ b
+a = a ^ b</code></pre>
+        </section>
+
+        <section>
+          <h2>Practice XOR</h2>
+          <p class="fragment">7 ^ 4 = ?</p>
+          <pre class="fragment"><code>7 = 0111
+4 = 0100
+XOR = 0011 = 3</code></pre>
+        </section>
+
+        <section>
+          <h2>XOR in Encryption</h2>
+          <pre class="fragment"><code>cipher = plain ^ key
+plain = cipher ^ key</code></pre>
+          <p class="fragment">Symmetric and fast</p>
+        </section>
+
+        <section>
+          <h2>XOR in Checksums</h2>
+          <p class="fragment">Used in RAID, file integrity</p>
+          <p class="fragment">Helps detect missing or changed data</p>
+        </section>
+
+        <section>
+          <h2>Find Missing Number</h2>
+          <pre class="fragment"><code>res = 0
+for i in range(1, n+1): res ^= i
+for num in arr: res ^= num</code></pre>
+          <p class="fragment">Result is the missing number</p>
+        </section>
+
+        <section>
+          <h2>Single Non-Duplicate</h2>
+          <pre class="fragment"><code>res = 0
+for num in arr:
+    res ^= num</code></pre>
+          <p class="fragment">Finds the number that appears only once</p>
+        </section>
+
+        <section>
+          <h2>XOR Brain Teasers</h2>
+          <ul>
+            <li class="fragment">a ^ a ^ b = ?</li>
+            <li class="fragment">If x ^ y = z, then x = z ^ y</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2>Summary</h2>
+          <ul>
+            <li class="fragment">XOR is simple but powerful</li>
+            <li class="fragment">Great for toggles, checks, encryption</li>
+          </ul>
+        </section>
+
+        <section data-transition="fade">
+          <h2>Thank You!</h2>
+          <p class="fragment">Questions?</p>
+        </section>
+
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/reveal.js/dist/reveal.js"></script>
+    <script>
+      Reveal.initialize({
+        transition: 'none',
+        slideNumber: true,
+        fragments: true
+      });
+    </script>
+  </body>
+</html>

@@ -55,9 +55,33 @@
             text-decoration: none;
             font-size: 0.95rem;
             white-space: normal;
+            position: relative;
         }
         .software-link:hover {
             background: #dce9ff;
+        }
+        .software-link::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            left: 0;
+            top: calc(100% + 8px);
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(-4px);
+            transition: opacity 0.15s ease, transform 0.15s ease;
+            background: rgba(22, 50, 79, 0.96);
+            color: #fff;
+            padding: 8px 10px;
+            border-radius: 8px;
+            font-size: 0.92rem;
+            line-height: 1.35;
+            white-space: nowrap;
+            z-index: 20;
+            box-shadow: 0 10px 24px rgba(16, 42, 67, 0.18);
+        }
+        .software-link:hover::after {
+            opacity: 1;
+            transform: translateY(0);
         }
         .publications li {
             margin-bottom: 10px;
@@ -110,35 +134,35 @@
             <div class="software-card">
                 <h3>Parallel Algorithm Package</h3>
                 <div class="software-links">
-                    <a class="software-link" href="https://github.com/rubaolee/B-SMP-i0" target="_blank" title="Stable marriage solver">Bamboo-SMP (PACT'25)</a>
-                    <a class="software-link" href="https://github.com/rubaolee/X-Blossom" target="_blank" title="Graph matching engine">X-Blossom (VLDB'25)</a>
-                    <a class="software-link" href="https://github.com/rubaolee/X-TED" target="_blank" title="Tree edit distance">X-TED (VLDB'24)</a>
+                    <a class="software-link" href="https://github.com/rubaolee/B-SMP-i0" target="_blank" data-tooltip="Stable marriage solver">Bamboo-SMP (PACT'25)</a>
+                    <a class="software-link" href="https://github.com/rubaolee/X-Blossom" target="_blank" data-tooltip="Graph matching engine">X-Blossom (VLDB'25)</a>
+                    <a class="software-link" href="https://github.com/rubaolee/X-TED" target="_blank" data-tooltip="Tree edit distance">X-TED (VLDB'24)</a>
                 </div>
             </div>
             <div class="software-card">
                 <h3>Ray Tracing Data Systems</h3>
                 <div class="software-links">
-                    <a class="software-link" href="https://github.com/rubaolee/RayDB-i0" target="_blank" title="Ray tracing database engine">RayDB (VLDB'26)</a>
-                    <a class="software-link" href="https://github.com/rubaolee/libRTS" target="_blank" title="Spatial indexing library">LibRTS (PPoPP'25)</a>
-                    <a class="software-link" href="https://github.com/rubaolee/RayJoin" target="_blank" title="Spatial join accelerator">RayJoin (ICS'24)</a>
+                    <a class="software-link" href="https://github.com/rubaolee/RayDB-i0" target="_blank" data-tooltip="Ray tracing database engine">RayDB (VLDB'26)</a>
+                    <a class="software-link" href="https://github.com/rubaolee/libRTS" target="_blank" data-tooltip="Spatial indexing library">LibRTS (PPoPP'25)</a>
+                    <a class="software-link" href="https://github.com/rubaolee/RayJoin" target="_blank" data-tooltip="Spatial join accelerator">RayJoin (ICS'24)</a>
                 </div>
             </div>
             <div class="software-card">
                 <h3>GPU Data Systems</h3>
                 <div class="software-links">
-                    <a class="software-link" href="https://github.com/rubaolee/UltraPrecise" target="_blank" title="Arbitrary-precision queries">UltraPrecise (ICDE'24)</a>
-                    <a class="software-link" href="https://github.com/rubaolee/NestGPU" target="_blank" title="Nested query processing">NestGPU (ICDE'21)</a>
-                    <a class="software-link" href="https://github.com/rubaolee/SEP-graph" target="_blank" title="GPU graph execution">SEP-Graph (PPoPP'19)</a>
-                    <a class="software-link" href="https://github.com/rubaolee/MegaKV" target="_blank" title="GPU key-value store">Mega-KV (VLDB'15)</a>
-                    <a class="software-link" href="https://github.com/rubaolee/GPUDB" target="_blank" title="GPU database system">GPUDB (VLDB'13)</a>
+                    <a class="software-link" href="https://github.com/rubaolee/UltraPrecise" target="_blank" data-tooltip="Arbitrary-precision queries">UltraPrecise (ICDE'24)</a>
+                    <a class="software-link" href="https://github.com/rubaolee/NestGPU" target="_blank" data-tooltip="Nested query processing">NestGPU (ICDE'21)</a>
+                    <a class="software-link" href="https://github.com/rubaolee/SEP-graph" target="_blank" data-tooltip="GPU graph execution">SEP-Graph (PPoPP'19)</a>
+                    <a class="software-link" href="https://github.com/rubaolee/MegaKV" target="_blank" data-tooltip="GPU key-value store">Mega-KV (VLDB'15)</a>
+                    <a class="software-link" href="https://github.com/rubaolee/GPUDB" target="_blank" data-tooltip="GPU database system">GPUDB (VLDB'13)</a>
                 </div>
             </div>
             <div class="software-card">
                 <h3>Other Systems</h3>
                 <div class="software-links">
-                    <a class="software-link" href="https://github.com/rubaolee/BCC-Silo" target="_blank" title="Optimistic concurrency control">BCC (VLDB'16)</a>
-                    <a class="software-link" href="https://github.com/rubaolee/Hadoop-GIS" target="_blank" title="Spatial Hadoop engine">Hadoop-GIS (VLDB'13)</a>
-                    <a class="software-link" href="https://github.com/rubaolee/Ysmart" target="_blank" title="SQL-to-MapReduce translator">YSmart (ICDCS'11)</a>
+                    <a class="software-link" href="https://github.com/rubaolee/BCC-Silo" target="_blank" data-tooltip="Optimistic concurrency control">BCC (VLDB'16)</a>
+                    <a class="software-link" href="https://github.com/rubaolee/Hadoop-GIS" target="_blank" data-tooltip="Spatial Hadoop engine">Hadoop-GIS (VLDB'13)</a>
+                    <a class="software-link" href="https://github.com/rubaolee/Ysmart" target="_blank" data-tooltip="SQL-to-MapReduce translator">YSmart (ICDCS'11)</a>
                 </div>
             </div>
         </div>

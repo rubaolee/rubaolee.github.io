@@ -108,6 +108,13 @@
         .software-link:hover {
             background: #dce9ff;
         }
+        .software-link.disabled {
+            color: #486581;
+            background: #f0f4f8;
+            border: 1px dashed #bcccdc;
+            cursor: default;
+            text-decoration: none;
+        }
         .software-link::after {
             content: attr(data-tooltip);
             position: absolute;
@@ -188,6 +195,7 @@
             <div class="software-card">
                 <h3>Parallel Algorithm Package</h3>
                 <div class="software-links">
+                    <span class="software-link disabled" data-tooltip="Code repository coming soon">X-HD (ICS'26)</span>
                     <a class="software-link" href="https://github.com/rubaolee/B-SMP-i0" target="_blank" data-tooltip="Stable marriage solver">Bamboo-SMP (PACT'25)</a>
                     <a class="software-link" href="https://github.com/rubaolee/X-Blossom" target="_blank" data-tooltip="Graph matching engine">X-Blossom (VLDB'25)</a>
                     <a class="software-link" href="https://github.com/rubaolee/X-TED" target="_blank" data-tooltip="Tree edit distance">X-TED (VLDB'24)</a>

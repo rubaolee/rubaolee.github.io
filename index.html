@@ -7,22 +7,13 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            margin: 0;
+            margin: 20px;
             line-height: 1.6;
             color: #243b53;
             background: linear-gradient(180deg, #f8fbff 0%, #ffffff 220px);
         }
-        .page {
-            max-width: 1120px;
-            margin: 0 auto;
-            padding: 24px 20px 56px;
-        }
         h1, h2, h3 {
             color: #333;
-        }
-        h2 {
-            margin-top: 0;
-            color: #102a43;
         }
         a {
             color: #174ea6;
@@ -30,7 +21,7 @@
         .hero {
             border: 1px solid #d9e5f2;
             border-radius: 20px;
-            padding: 28px;
+            padding: 24px;
             margin-bottom: 24px;
             background: linear-gradient(135deg, #ffffff 0%, #eef5ff 100%);
             box-shadow: 0 14px 32px rgba(16, 42, 67, 0.08);
@@ -46,19 +37,13 @@
             font-size: 1.08rem;
             color: #486581;
         }
-        .hero-grid {
-            display: grid;
-            grid-template-columns: minmax(0, 1.8fr) minmax(260px, 1fr);
-            gap: 18px;
-            align-items: start;
-        }
-        .hero-links, .hero-tags, .spotlight-links {
+        .hero-links, .hero-tags {
             display: flex;
             flex-wrap: wrap;
             gap: 10px;
             margin-top: 12px;
         }
-        .hero-link, .spotlight-link {
+        .hero-link {
             display: inline-block;
             padding: 7px 12px;
             border-radius: 999px;
@@ -76,71 +61,12 @@
             color: #16324f;
             font-size: 0.92rem;
         }
-        .hero-side,
-        .section-card,
-        .intro-card {
-            border: 1px solid #d9e5f2;
-            border-radius: 18px;
-            background: linear-gradient(180deg, #ffffff 0%, #f7fbff 100%);
-            box-shadow: 0 12px 26px rgba(16, 42, 67, 0.05);
-        }
-        .hero-side {
-            padding: 16px 18px;
-        }
-        .hero-side h2 {
-            margin-bottom: 8px;
-            font-size: 1rem;
-        }
-        .hero-side p {
-            margin: 0;
-            color: #486581;
-        }
-        .eyebrow {
-            display: inline-block;
-            margin-bottom: 10px;
-            padding: 6px 12px;
-            border-radius: 999px;
-            background: #e8f1ff;
-            color: #174ea6;
-            font-weight: 700;
-            font-size: 0.9rem;
-        }
-        .spotlight {
-            border: 1px solid #bfd4f6;
-            border-radius: 18px;
-            padding: 22px;
-            margin-bottom: 22px;
-            background: linear-gradient(135deg, #f7fbff 0%, #eaf2ff 100%);
-            box-shadow: 0 14px 30px rgba(23, 78, 166, 0.08);
-        }
-        .spotlight h2 {
-            margin-bottom: 8px;
-        }
-        .spotlight p {
-            max-width: 760px;
-            margin-top: 0;
-            color: #486581;
-        }
-        .intro-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-            gap: 16px;
-            margin-bottom: 22px;
-        }
-        .intro-card,
-        .section-card {
-            padding: 22px;
-        }
         .contact-info, .about, .honors-awards, .publications {
             margin-bottom: 20px;
         }
         ul {
             list-style-type: none;
             padding: 0;
-        }
-        .meta-list {
-            margin: 10px 0 0;
-            padding-left: 18px;
         }
         .software-code {
             margin-bottom: 28px;
@@ -226,15 +152,7 @@
             font-weight: 600;
             color: #16324f;
         }
-        @media (max-width: 860px) {
-            .hero-grid {
-                grid-template-columns: 1fr;
-            }
-        }
         @media (max-width: 640px) {
-            .page {
-                padding: 16px 14px 40px;
-            }
             .hero {
                 padding: 20px 18px;
             }
@@ -245,78 +163,19 @@
     </style>
 </head>
 <body>
-    <main class="page">
     <header class="hero">
-        <div class="hero-grid">
-            <div>
-                <h1>Rubao Lee</h1>
-                <p class="hero-subtitle"><a href="mailto:lee.rubao@ieee.org">lee.rubao@ieee.org</a></p>
-                <div class="hero-tags">
-                    <span class="hero-tag">Database Systems</span>
-                    <span class="hero-tag">Parallel Computing</span>
-                    <span class="hero-tag">Algorithm Engineering</span>
-                    <span class="hero-tag">Ray Tracing Data Systems</span>
-                </div>
-                <div class="hero-links">
-                    <a class="hero-link" href="/vldb26-tutorial/">VLDB 2026 Tutorial Proposal</a>
-                    <a class="hero-link" href="https://dblp.org/pid/41/6729" target="_blank">DBLP</a>
-                    <a class="hero-link" href="https://scholar.google.com/citations?user=Ajo5lnIAAAAJ" target="_blank">Google Scholar</a>
-                    <a class="hero-link" href="https://github.com/rubaolee" target="_blank">GitHub</a>
-                </div>
-            </div>
-            <aside class="hero-side">
-                <h2>Current Focus</h2>
-                <p>Building high-performance query engines and data systems that combine algorithmic design with modern GPU and ray tracing hardware.</p>
-            </aside>
-        </div>
+        <h1>Rubao Lee</h1>
+        <p class="hero-subtitle"><a href="mailto:lee.rubao@ieee.org">lee.rubao@ieee.org</a></p>
     </header>
 
-    <section class="spotlight">
-        <span class="eyebrow">Featured</span>
-        <h2>VLDB 2026 Tutorial Proposal</h2>
-        <p>Hardware Acceleration for Spatial Databases: Building Next-Generation Query Engines Using Ray Tracing Cores.</p>
-        <div class="spotlight-links">
-            <a class="spotlight-link" href="/vldb26-tutorial/">Open Proposal Page</a>
-            <a class="spotlight-link" href="paper_pdfs/2025-raydb.pdf" target="_blank">Related Paper: RayDB</a>
-            <a class="spotlight-link" href="https://github.com/rubaolee/libRTS" target="_blank">Related Code: LibRTS</a>
-        </div>
-    </section>
-
-    <section class="intro-grid">
-        <section class="intro-card">
-            <h2>About Me</h2>
-            <p>I am a computer scientist specializing in algorithm engineering, parallel computing, and advanced computer systems.</p>
-            <p>I received my Ph.D. in Computer Science in 2008 from the Institute of Computing Technology, Chinese Academy of Sciences.</p>
-            <p>My work focuses on scalable, high-performance solutions for complex data-intensive computing challenges, and I live in central Ohio, USA.</p>
-        </section>
-        <section class="intro-card">
-            <h2>Teaching</h2>
-            <ul class="meta-list">
-                <li>Spring 2026, <span class="course-title">CSE 2421: Systems I: Introduction to Low-Level Programming and Computer Organization</span>, The Ohio State University.</li>
-                <li>Autumn 2025, <span class="course-title">CSE 2421: Systems I: Introduction to Low-Level Programming and Computer Organization</span>, The Ohio State University.</li>
-                <li>Autumn 2025, <span class="course-title">CSE 3461: Computer Networking and Internet Technologies</span>, The Ohio State University.</li>
-                <li>Spring 2025, <span class="course-title">CSE 2431: System II: Introduction to Operating Systems</span>, The Ohio State University.</li>
-            </ul>
-        </section>
-        <section class="intro-card">
-            <h2>Honors and Awards</h2>
-            <ul class="meta-list">
-                <li>VLDB Test of Time Award, Very Large Data Base Endowment Inc., 2024</li>
-                <li>Ohio State Lumley Research Award, College of Engineering, The Ohio State University, 2018</li>
-                <li>ICDCS Best Paper Award, The 31st International Conference on Distributed Computing Systems, 2011</li>
-            </ul>
-        </section>
-    </section>
-
-    <section class="about" style="display: none;">
+    <section class="about">
         <h2>About Me</h2>
         <p>I am a computer scientist specializing in algorithm engineering, parallel computing, and advanced computer systems.</p>
 		<p>I received my Ph.D. in Computer Science in 2008 from the Institute of Computing Technology, Chinese Academy of Sciences.</p>
 		<p>My work focuses on scalable, high-performance solutions for complex data-intensive computing challenges, and I live in central Ohio, USA.</p>
-        <p><strong>New:</strong> <a href="/vldb26-tutorial/">VLDB 2026 Tutorial page</a>.</p>
     </section>
 
-    <section class="Teaching" style="display: none;">
+    <section class="Teaching">
         <h2>Teaching</h2>
         <ul>
             <li>Spring 2026, <span class="course-title">CSE 2421: Systems I: Introduction to Low-Level Programming and Computer Organization</span>, The Ohio State University.</li>
@@ -327,7 +186,7 @@
     </section>
 
 
-    <section class="honors-awards" style="display: none;">
+    <section class="honors-awards">
         <h2>Honors and Awards</h2>
         <ul>
             <li>VLDB Test of Time Award – Very Large Data Base Endowment Inc., 2024</li>
@@ -336,7 +195,7 @@
         </ul>
     </section>
 
-    <section class="software-code section-card">
+    <section class="software-code">
         <h2>Software Code</h2>
         <section class="current-project">
             <p><strong>Current Project:</strong> <a href="https://github.com/rubaolee/rtdl" target="_blank">RTDL: A Domain-Specific Language for Ray Tracing</a></p>
@@ -380,7 +239,7 @@
         </div>
     </section>
 
-    <section class="publications section-card">
+    <section class="publications">
         <h2>Publication: Book</h2>
 		<p>
         <strong>Data Management: Interactions with Computer Architecture and Systems</strong><br>
@@ -685,6 +544,5 @@
             </li>
         </ol>
     </section>
-    </main>
 </body>
 </html>

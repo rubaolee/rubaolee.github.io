@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VLDB 2026 Tutorial | Rubao Lee</title>
+    <style>
+        :root {
+            --ink: #102a43;
+            --muted: #486581;
+            --line: #d9e5f2;
+            --panel: #ffffff;
+            --panel-soft: #f4f8fc;
+            --accent: #174ea6;
+            --accent-soft: #e8f0fe;
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            color: var(--ink);
+            line-height: 1.65;
+            background:
+                radial-gradient(circle at top right, rgba(23, 78, 166, 0.10), transparent 28%),
+                linear-gradient(180deg, #f8fbff 0%, #ffffff 260px);
+        }
+        .page {
+            max-width: 980px;
+            margin: 0 auto;
+            padding: 28px 20px 56px;
+        }
+        .hero {
+            background: linear-gradient(135deg, #ffffff 0%, #edf4ff 100%);
+            border: 1px solid var(--line);
+            border-radius: 24px;
+            padding: 34px 28px;
+            box-shadow: 0 16px 34px rgba(16, 42, 67, 0.08);
+        }
+        .eyebrow {
+            display: inline-block;
+            margin-bottom: 10px;
+            padding: 6px 12px;
+            border-radius: 999px;
+            background: var(--accent-soft);
+            color: var(--accent);
+            font-size: 0.92rem;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+        }
+        h1 {
+            margin: 0;
+            font-size: clamp(2rem, 5vw, 3.4rem);
+            line-height: 1.08;
+            letter-spacing: -0.04em;
+        }
+        .hero p {
+            max-width: 720px;
+            margin: 14px 0 0;
+            font-size: 1.08rem;
+            color: var(--muted);
+        }
+        .hero-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 20px;
+        }
+        .hero-link {
+            display: inline-block;
+            padding: 10px 15px;
+            border-radius: 999px;
+            border: 1px solid var(--line);
+            background: #fff;
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 700;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 18px;
+            margin-top: 26px;
+        }
+        .card, .section {
+            border: 1px solid var(--line);
+            border-radius: 20px;
+            background: var(--panel);
+            box-shadow: 0 12px 28px rgba(16, 42, 67, 0.05);
+        }
+        .card {
+            padding: 20px;
+        }
+        .card h2 {
+            margin: 0 0 8px;
+            font-size: 1.1rem;
+        }
+        .card p {
+            margin: 0;
+            color: var(--muted);
+        }
+        .section {
+            margin-top: 22px;
+            padding: 24px;
+            background: linear-gradient(180deg, #ffffff 0%, var(--panel-soft) 100%);
+        }
+        .section h2 {
+            margin-top: 0;
+            margin-bottom: 12px;
+            font-size: 1.4rem;
+        }
+        .section p, .section li {
+            color: #243b53;
+        }
+        ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+        .placeholder {
+            padding: 14px 16px;
+            border-left: 4px solid var(--accent);
+            border-radius: 12px;
+            background: rgba(23, 78, 166, 0.08);
+        }
+        .footer {
+            margin-top: 24px;
+            text-align: center;
+            color: var(--muted);
+            font-size: 0.95rem;
+        }
+        a {
+            color: var(--accent);
+        }
+        @media (max-width: 640px) {
+            .page {
+                padding: 18px 14px 42px;
+            }
+            .hero {
+                padding: 24px 18px;
+            }
+            .section, .card {
+                padding: 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main class="page">
+        <section class="hero">
+            <div class="eyebrow">VLDB 2026 Tutorial</div>
+            <h1>Tutorial page in progress</h1>
+            <p>
+                This page has been created as the landing URL for the VLDB 2026 tutorial.
+                The final title, abstract, schedule, speakers, slides, and related materials
+                can be added here as soon as they are ready.
+            </p>
+            <div class="hero-links">
+                <a class="hero-link" href="/">Back to homepage</a>
+                <a class="hero-link" href="mailto:lee.rubao@ieee.org">Contact</a>
+            </div>
+        </section>
+
+        <section class="grid">
+            <article class="card">
+                <h2>Planned URL</h2>
+                <p><a href="https://rubaolee.github.io/vldb26-tutorial/">https://rubaolee.github.io/vldb26-tutorial/</a></p>
+            </article>
+            <article class="card">
+                <h2>Status</h2>
+                <p>Live placeholder page ready for tutorial details.</p>
+            </article>
+            <article class="card">
+                <h2>Next step</h2>
+                <p>Send the content you want included, and this page can be finalized quickly.</p>
+            </article>
+        </section>
+
+        <section class="section">
+            <h2>Content To Add</h2>
+            <div class="placeholder">
+                Fill in the tutorial title, speaker list, abstract, agenda, slides, papers, software links, registration details, and any FAQ or contact information you want visitors to see.
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Suggested Sections</h2>
+            <ul>
+                <li>Tutorial title and short overview</li>
+                <li>Presenters and affiliations</li>
+                <li>Abstract and motivation</li>
+                <li>Audience and prerequisites</li>
+                <li>Detailed agenda</li>
+                <li>Slides, code, datasets, and references</li>
+                <li>Event logistics and contact details</li>
+            </ul>
+        </section>
+
+        <p class="footer">Maintained at rubaolee.github.io for VLDB 2026 tutorial updates.</p>
+    </main>
+</body>
+</html>

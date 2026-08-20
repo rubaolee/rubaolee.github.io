@@ -3,276 +3,893 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Proposed VLDB 2026 Tutorial - Hardware Acceleration for Spatial Databases</title>
+    <meta name="description" content="VLDB 2026 tutorial materials for Hardware Acceleration for Spatial Databases, including the paper, presentation slides, source code, and tutorial outline.">
+    <meta name="theme-color" content="#8f1737">
+    <title>VLDB 2026 Tutorial | Hardware Acceleration for Spatial Databases</title>
     <style>
         :root {
-            --ink: #102a43;
-            --muted: #486581;
-            --line: #d9e5f2;
-            --panel: #ffffff;
-            --panel-soft: #f4f8fc;
-            --accent: #174ea6;
-            --accent-soft: #e8f0fe;
+            --paper: #f7f3eb;
+            --paper-deep: #ece4d7;
+            --surface: #fffdf9;
+            --ink: #1d252c;
+            --muted: #5d6469;
+            --line: #d9d0c2;
+            --accent: #a61942;
+            --accent-dark: #76102d;
+            --accent-soft: #f5e5e9;
+            --green: #2f6657;
+            --shadow: 0 18px 50px rgba(58, 42, 30, 0.10);
+            --radius: 22px;
         }
+
         * {
             box-sizing: border-box;
         }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
         body {
             margin: 0;
-            font-family: Arial, sans-serif;
             color: var(--ink);
+            font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
             line-height: 1.65;
-            background:
-                radial-gradient(circle at top right, rgba(23, 78, 166, 0.10), transparent 28%),
-                linear-gradient(180deg, #f8fbff 0%, #ffffff 260px);
+            background: var(--paper);
         }
-        .page {
-            max-width: 1280px;
+
+        a {
+            color: var(--accent-dark);
+        }
+
+        a:focus-visible,
+        button:focus-visible {
+            outline: 3px solid rgba(166, 25, 66, 0.35);
+            outline-offset: 4px;
+        }
+
+        .skip-link {
+            position: fixed;
+            top: 12px;
+            left: 12px;
+            z-index: 100;
+            padding: 10px 14px;
+            color: #fff;
+            background: var(--accent-dark);
+            border-radius: 8px;
+            transform: translateY(-160%);
+        }
+
+        .skip-link:focus {
+            transform: translateY(0);
+        }
+
+        .site-header {
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            border-bottom: 1px solid rgba(217, 208, 194, 0.85);
+            background: rgba(247, 243, 235, 0.92);
+            backdrop-filter: blur(14px);
+        }
+
+        .nav {
+            width: min(1180px, calc(100% - 40px));
+            min-height: 70px;
             margin: 0 auto;
-            padding: 36px 28px 72px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 28px;
         }
-        .hero {
-            background: linear-gradient(135deg, #ffffff 0%, #edf4ff 100%);
-            border: 1px solid var(--line);
-            border-radius: 24px;
-            padding: 42px 40px;
-            box-shadow: 0 16px 34px rgba(16, 42, 67, 0.08);
+
+        .brand {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--ink);
+            font-weight: 800;
+            text-decoration: none;
+            letter-spacing: -0.02em;
         }
-        .eyebrow {
-            display: inline-block;
-            margin-bottom: 10px;
-            padding: 6px 12px;
-            border-radius: 999px;
-            background: var(--accent-soft);
-            color: var(--accent);
-            font-size: 0.92rem;
-            font-weight: 700;
-            letter-spacing: 0.02em;
+
+        .brand-mark {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--accent);
+            box-shadow: 0 0 0 6px var(--accent-soft);
         }
-        h1 {
-            margin: 0;
-            font-size: clamp(2rem, 5vw, 3.4rem);
-            line-height: 1.08;
-            letter-spacing: -0.04em;
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 24px;
         }
-        .hero p {
-            max-width: 900px;
-            margin: 14px 0 0;
-            font-size: 1.12rem;
+
+        .nav-links a {
             color: var(--muted);
+            font-size: 0.94rem;
+            font-weight: 650;
+            text-decoration: none;
         }
-        .hero-links {
+
+        .nav-links a:hover {
+            color: var(--accent-dark);
+        }
+
+        .container {
+            width: min(1180px, calc(100% - 40px));
+            margin: 0 auto;
+        }
+
+        .hero {
+            position: relative;
+            overflow: hidden;
+            padding: clamp(72px, 10vw, 130px) 0 86px;
+            border-bottom: 1px solid var(--line);
+            background:
+                radial-gradient(circle at 85% 20%, rgba(166, 25, 66, 0.12), transparent 27%),
+                linear-gradient(135deg, #fbf8f2 0%, var(--paper) 62%, #efe5dd 100%);
+        }
+
+        .hero::after {
+            content: "";
+            position: absolute;
+            width: 420px;
+            height: 420px;
+            right: -150px;
+            bottom: -250px;
+            border: 1px solid rgba(166, 25, 66, 0.25);
+            border-radius: 50%;
+            box-shadow:
+                0 0 0 52px rgba(166, 25, 66, 0.035),
+                0 0 0 104px rgba(166, 25, 66, 0.025);
+        }
+
+        .hero-inner {
+            position: relative;
+            z-index: 1;
+            display: grid;
+            grid-template-columns: minmax(0, 1.5fr) minmax(260px, 0.5fr);
+            align-items: end;
+            gap: 64px;
+        }
+
+        .eyebrow {
+            margin: 0 0 18px;
+            color: var(--accent);
+            font-size: 0.83rem;
+            font-weight: 850;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+        }
+
+        h1,
+        h2,
+        h3 {
+            font-family: Georgia, "Times New Roman", serif;
+            text-wrap: balance;
+        }
+
+        h1 {
+            max-width: 930px;
+            margin: 0;
+            font-size: clamp(2.7rem, 6.4vw, 5.6rem);
+            line-height: 0.98;
+            letter-spacing: -0.055em;
+        }
+
+        .hero-summary {
+            max-width: 800px;
+            margin: 30px 0 0;
+            color: #41484d;
+            font-size: clamp(1.08rem, 1.7vw, 1.28rem);
+        }
+
+        .hero-actions {
             display: flex;
             flex-wrap: wrap;
             gap: 12px;
-            margin-top: 20px;
+            margin-top: 32px;
         }
-        .hero-link {
-            display: inline-block;
-            padding: 10px 15px;
+
+        .button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 48px;
+            padding: 11px 18px;
+            border: 1px solid var(--accent-dark);
             border-radius: 999px;
-            border: 1px solid var(--line);
-            background: #fff;
-            color: var(--accent);
+            color: #fff;
+            background: var(--accent-dark);
+            font-weight: 750;
             text-decoration: none;
+            transition: transform 160ms ease, box-shadow 160ms ease, background 160ms ease;
+        }
+
+        .button:hover {
+            transform: translateY(-2px);
+            background: #5f0d25;
+            box-shadow: 0 10px 24px rgba(118, 16, 45, 0.2);
+        }
+
+        .button.secondary {
+            color: var(--accent-dark);
+            background: transparent;
+        }
+
+        .hero-meta {
+            margin: 0;
+            padding: 0 0 6px;
+            list-style: none;
+        }
+
+        .hero-meta li {
+            padding: 14px 0;
+            border-top: 1px solid var(--line);
+        }
+
+        .meta-label {
+            display: block;
+            margin-bottom: 2px;
+            color: var(--muted);
+            font-size: 0.76rem;
+            font-weight: 800;
+            letter-spacing: 0.09em;
+            text-transform: uppercase;
+        }
+
+        main section {
+            scroll-margin-top: 92px;
+        }
+
+        .section {
+            padding: 96px 0;
+        }
+
+        .section + .section {
+            border-top: 1px solid var(--line);
+        }
+
+        .section-heading {
+            display: grid;
+            grid-template-columns: minmax(220px, 0.42fr) minmax(0, 1fr);
+            gap: 56px;
+            margin-bottom: 42px;
+        }
+
+        .section-heading h2 {
+            margin: 0;
+            font-size: clamp(2rem, 4vw, 3.3rem);
+            line-height: 1.05;
+            letter-spacing: -0.035em;
+        }
+
+        .section-heading p {
+            max-width: 720px;
+            margin: 5px 0 0;
+            color: var(--muted);
+            font-size: 1.08rem;
+        }
+
+        .resources {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 28px;
+        }
+
+        .resource-card {
+            overflow: hidden;
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            background: var(--surface);
+            box-shadow: var(--shadow);
+        }
+
+        .resource-preview {
+            display: grid;
+            place-items: center;
+            height: 270px;
+            padding: 22px;
+            border-bottom: 1px solid var(--line);
+            background: linear-gradient(150deg, #e8e0d5 0%, #f7f2e9 100%);
+        }
+
+        .resource-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            filter: drop-shadow(0 12px 20px rgba(45, 34, 25, 0.14));
+        }
+
+        .resource-body {
+            padding: 28px;
+        }
+
+        .resource-type {
+            color: var(--accent);
+            font-size: 0.78rem;
+            font-weight: 850;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+
+        .resource-body h3 {
+            margin: 7px 0 8px;
+            font-size: 1.75rem;
+            line-height: 1.12;
+        }
+
+        .resource-body p {
+            margin: 0;
+            color: var(--muted);
+        }
+
+        .file-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px 18px;
+            margin-top: 16px;
+            color: #3f474c;
+            font-size: 0.9rem;
+            font-weight: 650;
+        }
+
+        .resource-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .text-link {
+            display: inline-flex;
+            align-items: center;
+            min-height: 44px;
+            padding: 9px 15px;
+            border: 1px solid var(--line);
+            border-radius: 999px;
+            color: var(--accent-dark);
+            background: #fff;
+            font-weight: 750;
+            text-decoration: none;
+        }
+
+        .text-link:hover {
+            border-color: var(--accent);
+            background: var(--accent-soft);
+        }
+
+        .reading-layout {
+            display: grid;
+            grid-template-columns: minmax(0, 0.62fr) minmax(320px, 0.38fr);
+            gap: 68px;
+            align-items: start;
+        }
+
+        .prose h2 {
+            margin: 0 0 24px;
+            font-size: clamp(2rem, 4vw, 3.25rem);
+            line-height: 1.05;
+            letter-spacing: -0.035em;
+        }
+
+        .prose p {
+            margin: 0 0 18px;
+            color: #343c41;
+            font-family: Georgia, "Times New Roman", serif;
+            font-size: 1.13rem;
+            line-height: 1.78;
+        }
+
+        .prose p:last-child {
+            margin-bottom: 0;
+        }
+
+        .audience-note {
+            padding: 30px;
+            border-left: 4px solid var(--accent);
+            border-radius: 0 var(--radius) var(--radius) 0;
+            background: var(--accent-soft);
+        }
+
+        .audience-note h3 {
+            margin: 0 0 10px;
+            font-size: 1.35rem;
+        }
+
+        .audience-note p {
+            margin: 0;
+            color: #4f4448;
+        }
+
+        .topic-list {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            margin: 0;
+            padding: 0;
+            list-style: none;
+            border-top: 1px solid var(--line);
+        }
+
+        .topic-list li {
+            display: grid;
+            grid-template-columns: 54px 1fr;
+            gap: 16px;
+            padding: 25px 24px 25px 0;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .topic-list li:nth-child(odd) {
+            padding-right: 34px;
+            border-right: 1px solid var(--line);
+        }
+
+        .topic-list li:nth-child(even) {
+            padding-left: 34px;
+        }
+
+        .topic-number {
+            color: var(--accent);
+            font-family: Georgia, "Times New Roman", serif;
+            font-size: 1.35rem;
             font-weight: 700;
         }
-        .grid {
+
+        .topic-list h3 {
+            margin: 0 0 5px;
+            font-size: 1.22rem;
+        }
+
+        .topic-list p {
+            margin: 0;
+            color: var(--muted);
+        }
+
+        .code-list {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
-            margin-top: 28px;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px;
         }
-        .card, .section {
-            border: 1px solid var(--line);
-            border-radius: 20px;
-            background: var(--panel);
-            box-shadow: 0 12px 28px rgba(16, 42, 67, 0.05);
-        }
-        .card {
+
+        .code-item {
             padding: 24px;
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            background: rgba(255, 253, 249, 0.7);
         }
-        .card h2 {
+
+        .code-item h3 {
+            margin: 0 0 6px;
+            font-size: 1.18rem;
+        }
+
+        .code-item h3 a {
+            text-decoration-thickness: 1px;
+            text-underline-offset: 4px;
+        }
+
+        .code-item p {
+            margin: 0;
+            color: var(--muted);
+        }
+
+        .speakers {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 18px;
+        }
+
+        .speaker {
+            padding: 26px 0 4px;
+            border-top: 3px solid var(--accent);
+        }
+
+        .speaker h3 {
+            margin: 0 0 6px;
+            font-size: 1.45rem;
+        }
+
+        .speaker p {
+            margin: 0 0 10px;
+            color: var(--muted);
+        }
+
+        .speaker a {
+            font-weight: 700;
+        }
+
+        .citation {
+            margin-top: 50px;
+            padding: 26px 30px;
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            background: var(--surface);
+        }
+
+        .citation h3 {
             margin: 0 0 8px;
-            font-size: 1.1rem;
+            font-size: 1.15rem;
         }
-        .card p {
+
+        .citation p {
             margin: 0;
+            color: #424a4f;
+        }
+
+        footer {
+            padding: 34px 0 48px;
+            border-top: 1px solid var(--line);
             color: var(--muted);
+            font-size: 0.92rem;
         }
-        .section {
-            margin-top: 24px;
-            padding: 30px 34px;
-            background: linear-gradient(180deg, #ffffff 0%, var(--panel-soft) 100%);
+
+        .footer-inner {
+            display: flex;
+            justify-content: space-between;
+            gap: 24px;
         }
-        .section h2 {
-            margin-top: 0;
-            margin-bottom: 12px;
-            font-size: 1.4rem;
-        }
-        .section p, .section li {
-            color: #243b53;
-        }
-        ul {
-            margin: 0;
-            padding-left: 20px;
-        }
-        .placeholder {
-            padding: 14px 16px;
-            border-left: 4px solid var(--accent);
-            border-radius: 12px;
-            background: rgba(23, 78, 166, 0.08);
-        }
-        .footer {
-            margin-top: 24px;
-            text-align: center;
-            color: var(--muted);
-            font-size: 0.95rem;
-        }
-        a {
-            color: var(--accent);
-        }
-        @media (min-width: 960px) {
-            .grid {
-                grid-template-columns: repeat(3, minmax(0, 1fr));
+
+        @media (max-width: 860px) {
+            .hero-inner,
+            .section-heading,
+            .reading-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .hero-inner {
+                gap: 44px;
+            }
+
+            .section-heading {
+                gap: 16px;
+            }
+
+            .resources,
+            .speakers {
+                grid-template-columns: 1fr;
+            }
+
+            .speakers {
+                gap: 28px;
             }
         }
-        @media (max-width: 640px) {
-            .page {
-                padding: 18px 14px 42px;
+
+        @media (max-width: 680px) {
+            .nav {
+                width: min(100% - 28px, 1180px);
+                min-height: 62px;
             }
+
+            .nav-links a:not(:last-child) {
+                display: none;
+            }
+
+            .container {
+                width: min(100% - 28px, 1180px);
+            }
+
             .hero {
-                padding: 24px 18px;
+                padding: 62px 0 66px;
             }
-            .section, .card {
-                padding: 18px;
+
+            h1 {
+                font-size: clamp(2.6rem, 13vw, 4.3rem);
+            }
+
+            .section {
+                padding: 68px 0;
+            }
+
+            .resource-preview {
+                height: 220px;
+            }
+
+            .resource-body {
+                padding: 22px;
+            }
+
+            .topic-list,
+            .code-list {
+                grid-template-columns: 1fr;
+            }
+
+            .topic-list li,
+            .topic-list li:nth-child(odd),
+            .topic-list li:nth-child(even) {
+                padding: 22px 0;
+                border-right: 0;
+            }
+
+            .footer-inner {
+                flex-direction: column;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            html {
+                scroll-behavior: auto;
+            }
+
+            .button {
+                transition: none;
             }
         }
     </style>
 </head>
 <body>
-    <main class="page">
-        <section class="hero">
-            <div class="eyebrow">Proposed VLDB 2026 Tutorial</div>
-            <h1>Hardware Acceleration for Spatial Databases: Building Next-Generation Query Engines Using Ray Tracing Cores</h1>
-            <p>
-                A proposed VLDB 2026 tutorial on how ray tracing cores in modern GPUs can be repurposed
-                to accelerate spatial joins, indexing, distance computation, and full spatial
-                database engines.
-            </p>
-            <div class="hero-links">
-                <a class="hero-link" href="/">Back to homepage</a>
-                <a class="hero-link" href="mailto:lee.rubao@ieee.org">Contact</a>
+    <a class="skip-link" href="#content">Skip to content</a>
+
+    <header class="site-header">
+        <nav class="nav" aria-label="Main navigation">
+            <a class="brand" href="./" aria-label="VLDB 2026 tutorial home">
+                <span class="brand-mark" aria-hidden="true"></span>
+                VLDB 2026 Tutorial
+            </a>
+            <div class="nav-links">
+                <a href="#materials">Materials</a>
+                <a href="#outline">Outline</a>
+                <a href="#code">Code</a>
+                <a href="/">Rubao Lee</a>
+            </div>
+        </nav>
+    </header>
+
+    <div class="hero">
+        <div class="container hero-inner">
+            <div>
+                <p class="eyebrow">VLDB 2026 · Tutorial Materials</p>
+                <h1>Hardware Acceleration for Spatial Databases</h1>
+                <p class="hero-summary">
+                    Building next-generation query engines with ray tracing cores - from hardware
+                    fundamentals and spatial operators to indexing, distance computation, and a
+                    full integration with Apache SedonaDB.
+                </p>
+                <div class="hero-actions">
+                    <a class="button" href="#materials">View materials</a>
+                    <a class="button secondary" href="p2628_lee.pdf" target="_blank" rel="noopener">Read the paper</a>
+                </div>
+            </div>
+            <ul class="hero-meta" aria-label="Tutorial details">
+                <li>
+                    <span class="meta-label">Presenters</span>
+                    Rubao Lee, Liang Geng, Xiaodong Zhang
+                </li>
+                <li>
+                    <span class="meta-label">Affiliation</span>
+                    The Ohio State University
+                </li>
+                <li>
+                    <span class="meta-label">Focus</span>
+                    Databases · GPUs · Ray Tracing
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <main id="content">
+        <section class="section" id="materials">
+            <div class="container">
+                <div class="section-heading">
+                    <h2>Tutorial materials</h2>
+                    <p>
+                        Start with the slides for the complete tutorial narrative, or read the
+                        concise paper for the motivation, design space, and related systems.
+                    </p>
+                </div>
+
+                <div class="resources">
+                    <article class="resource-card">
+                        <div class="resource-preview">
+                            <img src="assets/slides-cover.jpg" alt="Title slide for Hardware Acceleration for Spatial Databases" width="1200" height="675">
+                        </div>
+                        <div class="resource-body">
+                            <span class="resource-type">Presentation</span>
+                            <h3>Complete tutorial slides</h3>
+                            <p>
+                                The full teaching deck, covering ray tracing fundamentals and four
+                                connected spatial database case studies.
+                            </p>
+                            <div class="file-meta" aria-label="Slide file details">
+                                <span>98 slides</span>
+                                <span>PowerPoint</span>
+                                <span>24.9 MB</span>
+                            </div>
+                            <div class="resource-links">
+                                <a class="text-link" href="VLDB2026-tutorial.pptx" download>Download slides (.pptx)</a>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="resource-card">
+                        <div class="resource-preview">
+                            <img src="assets/paper-cover.jpg" alt="First page of the VLDB 2026 tutorial paper" width="695" height="900" loading="lazy">
+                        </div>
+                        <div class="resource-body">
+                            <span class="resource-type">PVLDB Paper</span>
+                            <h3>Tutorial paper</h3>
+                            <p>
+                                A compact overview of the tutorial scope, audience, case studies,
+                                learning goals, and supporting materials.
+                            </p>
+                            <div class="file-meta" aria-label="Paper file details">
+                                <span>5 pages</span>
+                                <span>PDF</span>
+                                <span>417 KB</span>
+                            </div>
+                            <div class="resource-links">
+                                <a class="text-link" href="p2628_lee.pdf" target="_blank" rel="noopener">Open paper (.pdf)</a>
+                                <a class="text-link" href="https://doi.org/10.14778/3827998.3828056" target="_blank" rel="noopener">DOI</a>
+                            </div>
+                        </div>
+                    </article>
+                </div>
             </div>
         </section>
 
-        <section class="grid">
-            <article class="card">
-                <h2>URL</h2>
-                <p><a href="https://rubaolee.github.io/vldb26-tutorial/">https://rubaolee.github.io/vldb26-tutorial/</a></p>
-            </article>
-            <article class="card">
-                <h2>Proposed Presenters</h2>
-                <p>Rubao Lee, Liang Geng, and Xiaodong Zhang, The Ohio State University.</p>
-            </article>
-            <article class="card">
-                <h2>Format</h2>
-                <p>Planned as a 1.5-hour or 3-hour tutorial session, if accepted.</p>
-            </article>
+        <section class="section" id="about">
+            <div class="container reading-layout">
+                <div class="prose">
+                    <h2>From graphics hardware to database systems</h2>
+                    <p>
+                        Modern database systems are increasingly shaped by domain-specific hardware,
+                        but effective use of that hardware requires new abstractions, programming
+                        methods, and algorithmic reformulations. This tutorial explains how ray
+                        tracing cores in commodity GPUs can be repurposed to accelerate spatial data
+                        operations by treating search and refinement tasks as ray-geometry
+                        intersection problems.
+                    </p>
+                    <p>
+                        Four connected case studies create a path from hardware principles and ray
+                        tracing programming, through query operators and index design, to deployment
+                        in an industrial spatial database. The emphasis is not only on performance,
+                        but on the systems lessons behind making a specialized accelerator useful to
+                        database developers.
+                    </p>
+                </div>
+                <aside class="audience-note">
+                    <h3>Who should attend?</h3>
+                    <p>
+                        Database and systems researchers, GPU programmers, practitioners, and
+                        students. A basic background in database systems or GPU programming is
+                        helpful; prior graphics experience is not required.
+                    </p>
+                </aside>
+            </div>
         </section>
 
-        <section class="section">
-            <h2>Proposal Status</h2>
-            <p>
-                This page presents public materials for a VLDB 2026 tutorial proposal. It is
-                intended to summarize the scope, motivation, structure, and supporting systems
-                for the proposed session while the submission is under review.
-            </p>
+        <section class="section" id="outline">
+            <div class="container">
+                <div class="section-heading">
+                    <h2>What the tutorial covers</h2>
+                    <p>
+                        The material moves from first principles to a production-oriented system,
+                        with each section building on the same ray-based view of spatial processing.
+                    </p>
+                </div>
+                <ol class="topic-list">
+                    <li>
+                        <span class="topic-number">01</span>
+                        <div>
+                            <h3>Ray tracing fundamentals</h3>
+                            <p>RT cores, BVH traversal, the rendering pipeline, and NVIDIA OptiX.</p>
+                        </div>
+                    </li>
+                    <li>
+                        <span class="topic-number">02</span>
+                        <div>
+                            <h3>Spatial joins</h3>
+                            <p>Line-segment intersection, point-in-polygon, and limited-precision challenges.</p>
+                        </div>
+                    </li>
+                    <li>
+                        <span class="topic-number">03</span>
+                        <div>
+                            <h3>Spatial indexing</h3>
+                            <p>Point and range queries, updates, mutability, and load balancing.</p>
+                        </div>
+                    </li>
+                    <li>
+                        <span class="topic-number">04</span>
+                        <div>
+                            <h3>Spatial functions</h3>
+                            <p>Hausdorff distance as a case study in RT-accelerated spatial computation.</p>
+                        </div>
+                    </li>
+                    <li>
+                        <span class="topic-number">05</span>
+                        <div>
+                            <h3>Apache SedonaDB</h3>
+                            <p>Engineering a GPU-friendly spatial engine and integrating acceleration end to end.</p>
+                        </div>
+                    </li>
+                    <li>
+                        <span class="topic-number">06</span>
+                        <div>
+                            <h3>Lessons and opportunities</h3>
+                            <p>What generalizes, what remains difficult, and where the research can go next.</p>
+                        </div>
+                    </li>
+                </ol>
+            </div>
         </section>
 
-        <section class="section">
-            <h2>Abstract</h2>
-            <p>
-                Modern database systems are increasingly shaped by domain-specific hardware, yet
-                using such hardware effectively still requires new system abstractions, programming
-                methods, and algorithmic reformulations. This proposed tutorial presents a case study of
-                hardware-accelerated ray-tracing spatial database systems. We explain how Ray
-                Tracing (RT) cores in commodity GPUs, originally designed for graphics rendering,
-                can be repurposed to accelerate key spatial data operations by treating spatial
-                search and refinement tasks as ray-geometry intersection problems.
-            </p>
-            <p>
-                The proposed tutorial is organized around representative case studies in RT-based
-                spatial join, RT-based spatial indexing, RT-based acceleration of Hausdorff distance
-                computation, and the integration of RT acceleration into Apache SedonaDB. Together,
-                these examples provide a coherent path from hardware principles and RT programming,
-                to query operators and index design, to real system deployment.
-            </p>
+        <section class="section" id="code">
+            <div class="container">
+                <div class="section-heading">
+                    <h2>Explore the systems</h2>
+                    <p>
+                        The tutorial is grounded in open implementations. Use these repositories to
+                        reproduce results, inspect the engineering, or build on the ideas.
+                    </p>
+                </div>
+                <div class="code-list">
+                    <article class="code-item">
+                        <h3><a href="https://github.com/rubaolee/RayJoin" target="_blank" rel="noopener">RayJoin</a></h3>
+                        <p>Ray tracing acceleration for spatial joins, including line-segment intersection and point-in-polygon.</p>
+                    </article>
+                    <article class="code-item">
+                        <h3><a href="https://github.com/rubaolee/libRTS" target="_blank" rel="noopener">LibRTS</a></h3>
+                        <p>A spatial indexing library built on ray tracing hardware.</p>
+                    </article>
+                    <article class="code-item">
+                        <h3><a href="https://github.com/rubaolee/X-HD" target="_blank" rel="noopener">X-HD</a></h3>
+                        <p>Fast Hausdorff distance computation with ray tracing cores.</p>
+                    </article>
+                    <article class="code-item">
+                        <h3><a href="https://github.com/apache/sedona-db/tree/main/c/sedona-libgpuspatial/libgpuspatial" target="_blank" rel="noopener">SedonaDB GPU Spatial</a></h3>
+                        <p>The GPU spatial library and integration path used by Apache SedonaDB.</p>
+                    </article>
+                </div>
+            </div>
         </section>
 
-        <section class="section">
-            <h2>Open-Source Code</h2>
-            <p>
-                The tutorial will reference public implementations that illustrate the design
-                space discussed in the session. The following codebases provide concrete starting
-                points for experimentation, reproduction, and follow-on system building.
-            </p>
-            <ul>
-                <li><a href="https://github.com/rubaolee/RayJoin">RayJoin</a> - RT-based spatial join acceleration for line-segment intersection and point-in-polygon workloads.</li>
-                <li><a href="https://github.com/rubaolee/libRTS">LibRTS</a> - A spatial indexing library built on ray tracing hardware.</li>
-                <li><a href="https://github.com/rubaolee/X-HD">X-HD code</a> | <a href="https://rubaolee.github.io/paper_pdfs/2026-xhd.pdf">X-HD paper PDF</a> - Fast Hausdorff distance computation with ray tracing.</li>
-                <li><a href="https://github.com/apache/sedona-db/tree/main/c/sedona-libgpuspatial/libgpuspatial">SedonaDB GPU spatial integration</a> - Apache SedonaDB integration path for RT/GPU-accelerated spatial processing.</li>
-            </ul>
-        </section>
+        <section class="section" id="presenters">
+            <div class="container">
+                <div class="section-heading">
+                    <h2>Presenters</h2>
+                    <p>
+                        The tutorial brings together the researchers behind the systems and the
+                        broader hardware-conscious data management research program.
+                    </p>
+                </div>
+                <div class="speakers">
+                    <article class="speaker">
+                        <h3>Rubao Lee</h3>
+                        <p>Senior Research Scientist<br>The Ohio State University</p>
+                        <a href="mailto:lee.11875@osu.edu">lee.11875@osu.edu</a>
+                    </article>
+                    <article class="speaker">
+                        <h3>Liang Geng</h3>
+                        <p>Ph.D. Candidate<br>The Ohio State University</p>
+                        <a href="mailto:geng.161@buckeyemail.osu.edu">geng.161@buckeyemail.osu.edu</a>
+                    </article>
+                    <article class="speaker">
+                        <h3>Xiaodong Zhang</h3>
+                        <p>Professor<br>The Ohio State University</p>
+                        <a href="mailto:zhang@cse.ohio-state.edu">zhang@cse.ohio-state.edu</a>
+                    </article>
+                </div>
 
-        <section class="section">
-            <h2>Audience</h2>
-            <p>
-                The proposed tutorial targets database researchers, systems researchers, GPU programmers,
-                practitioners, and students who are interested in building next-generation query
-                engines on modern hardware. Only a basic background in database systems or GPU
-                programming is assumed, and no prior graphics experience is required.
-            </p>
+                <div class="citation">
+                    <h3>Suggested citation</h3>
+                    <p>
+                        Rubao Lee, Liang Geng, and Xiaodong Zhang. "Hardware Acceleration for Spatial
+                        Databases: Building Next-Generation Query Engines Using Ray Tracing Cores."
+                        PVLDB 19(12): 4862-4866, 2026.
+                    </p>
+                </div>
+            </div>
         </section>
-
-        <section class="section">
-            <h2>Topics</h2>
-            <ul>
-                <li>RT programming fundamentals, BVH traversal, and NVIDIA OptiX</li>
-                <li>RT for spatial join, including line-segment intersection and point-in-polygon</li>
-                <li>RT for spatial indexing with point, range, and mutable-data support</li>
-                <li>RT for spatial functions using Hausdorff distance as a case study</li>
-                <li>System integration in Apache SedonaDB</li>
-                <li>Research opportunities beyond current spatial workloads</li>
-            </ul>
-        </section>
-
-        <section class="section">
-            <h2>Schedule</h2>
-            <ul>
-                <li>Background and RT Programming - 15 minutes</li>
-                <li>Spatial Join Acceleration - 15 minutes</li>
-                <li>Spatial Indexing - 15 minutes</li>
-                <li>Hausdorff Distance Computation - 15 minutes</li>
-                <li>SedonaDB Integration - 15 minutes</li>
-                <li>Discussion and Q&amp;A - 15 minutes</li>
-            </ul>
-            <p>
-                For an extended 3-hour format, each topic can be expanded with deeper technical
-                discussion, broader comparative context, and more interactive questions.
-            </p>
-        </section>
-
-        <section class="section">
-            <h2>Proposed Presenters</h2>
-            <ul>
-                <li><strong>Rubao Lee</strong> - Senior Research Scientist, Department of Computer Science and Engineering, The Ohio State University. Email: <a href="mailto:lee.11875@osu.edu">lee.11875@osu.edu</a></li>
-                <li><strong>Liang Geng</strong> - Ph.D. candidate, Department of Computer Science and Engineering, The Ohio State University. Email: <a href="mailto:geng.161@buckeyemail.osu.edu">geng.161@buckeyemail.osu.edu</a></li>
-                <li><strong>Xiaodong Zhang</strong> - Professor, Department of Computer Science and Engineering, The Ohio State University. Email: <a href="mailto:zhang@cse.ohio-state.edu">zhang@cse.ohio-state.edu</a></li>
-            </ul>
-        </section>
-
-        <p class="footer">Maintained at rubaolee.github.io for VLDB 2026 tutorial proposal materials and updates.</p>
     </main>
+
+    <footer>
+        <div class="container footer-inner">
+            <span>VLDB 2026 Tutorial · Hardware Acceleration for Spatial Databases</span>
+            <a href="/">Return to Rubao Lee's homepage</a>
+        </div>
+    </footer>
 </body>
 </html>

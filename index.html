@@ -147,6 +147,17 @@
         .publications li {
             margin-bottom: 10px;
         }
+        .publication-status {
+            display: inline-block;
+            margin-left: 6px;
+            padding: 2px 8px;
+            border-radius: 999px;
+            background: #e7f4ed;
+            color: #236449;
+            font-size: 0.84rem;
+            font-weight: 700;
+            vertical-align: 1px;
+        }
         .course-title {
             font-style: italic;
             font-weight: 600;
@@ -204,6 +215,7 @@
             <div class="software-card">
                 <h3>Parallel Algorithm Package</h3>
                 <div class="software-links">
+                    <a class="software-link" href="https://github.com/rubaolee/X-Wim" target="_blank" data-tooltip="Parallel weighted matching in bipartite graphs">X-Wim (VLDB'26)</a>
                     <a class="software-link" href="https://github.com/rubaolee/X-HD" target="_blank" data-tooltip="Fast Hausdorff distance computation">X-HD (ICS'26)</a>
                     <a class="software-link" href="https://github.com/rubaolee/B-SMP-i0" target="_blank" data-tooltip="Stable marriage solver">Bamboo-SMP (PACT'25)</a>
                     <a class="software-link" href="https://github.com/rubaolee/X-Blossom" target="_blank" data-tooltip="Graph matching engine">X-Blossom (VLDB'25)</a>
@@ -213,6 +225,7 @@
             <div class="software-card">
                 <h3>Ray Tracing Data Systems</h3>
                 <div class="software-links">
+                    <a class="software-link" href="https://github.com/apache/sedona-db/tree/main/c/sedona-libgpuspatial/libgpuspatial" target="_blank" data-tooltip="RT-accelerated spatial queries in SedonaDB">RayBooster (VLDB'26)</a>
                     <a class="software-link" href="https://github.com/rubaolee/RayDB-i0" target="_blank" data-tooltip="Ray tracing database engine">RayDB (VLDB'26)</a>
                     <a class="software-link" href="https://github.com/rubaolee/libRTS" target="_blank" data-tooltip="Spatial indexing library">LibRTS (PPoPP'25)</a>
                     <a class="software-link" href="https://github.com/rubaolee/RayJoin" target="_blank" data-tooltip="Spatial join accelerator">RayJoin (ICS'24)</a>
@@ -259,6 +272,24 @@
 
         <h2>Publication: Full Papers (<a href="https://dblp.org/pid/41/6729" target="_blank">DBLP</a> | <a href="https://scholar.google.com/citations?user=Ajo5lnIAAAAJ" target="_blank">Google Scholar</a>) </h2>
         <ol>
+			<li>X-Wim: Massive Parallelization of Weighted Matching in Bipartite Graphs<br>
+                Dayi Fan, Simon Zhang, Rubao Lee, Hanqi Guo, Xiaodong Zhang<br>
+                <strong>VLDB 2026</strong>: Proceedings of the VLDB Endowment 19(10), 2643-2657, 2026.<br>
+				<a href="paper_pdfs/2026-xwim.pdf" target="_blank">PDF</a> |
+				<a href="https://github.com/rubaolee/X-Wim" target="_blank">Code</a>
+            </li>
+			<li>RayBooster: A Ray Tracing Engine to Accelerate SedonaDB [Industry]<br>
+                Liang Geng, Rubao Lee, Dewey Dunnington, Feng Zhang, Jia Yu, Xiaodong Zhang<br>
+                <strong>VLDB 2026 Industry Track</strong>: Accepted, to appear.<br>
+				<a href="paper_pdfs/2026-raybooster.pdf" target="_blank">PDF</a> |
+				<a href="https://jiayuasu.github.io/publication/y2026-sedonadb-vldb/" target="_blank">Project Page</a> |
+				<a href="https://github.com/apache/sedona-db/tree/main/c/sedona-libgpuspatial/libgpuspatial" target="_blank">Code</a>
+            </li>
+			<li>RobotFD: GPU-Accelerated Frechet Distance for Robot Path Analysis<br>
+                Zhehu Yuan*, Rubao Lee, Xiaodong Zhang<br>
+                <strong>IROS 2026</strong>: 2026 IEEE/RSJ International Conference on Intelligent Robots and Systems.
+                <span class="publication-status">Accepted · To appear</span>
+            </li>
 				<li>X-HD: Fast Hausdorff Distance Computation with Ray Tracing<br>
                 Liang Geng, Zhehu Yuan, Rubao Lee, Fusheng Wang, Xiaodong Zhang<br>
                 <strong>ICS 2026</strong>: Proceedings of International Conference on Supercomputing, July 06-09, 2026, Belfast, United Kingdom.<br>

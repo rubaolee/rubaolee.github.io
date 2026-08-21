@@ -61,7 +61,7 @@
             color: #16324f;
             font-size: 0.92rem;
         }
-        .contact-info, .about, .honors-awards, .publications {
+        .contact-info, .about, .tutorials, .honors-awards, .publications {
             margin-bottom: 20px;
         }
         ul {
@@ -166,12 +166,60 @@
             font-weight: 600;
             color: #16324f;
         }
+        .tutorial-card {
+            max-width: 1040px;
+            padding: 20px 22px;
+            border: 1px solid #d7e0ea;
+            border-radius: 16px;
+            background: linear-gradient(135deg, #ffffff 0%, #f1f6fd 100%);
+            box-shadow: 0 10px 24px rgba(16, 42, 67, 0.06);
+        }
+        .tutorial-card h3 {
+            margin: 0;
+            color: #16324f;
+            font-size: 1.12rem;
+        }
+        .tutorial-summary {
+            max-width: 900px;
+            margin: 10px 0 6px;
+            color: #334e68;
+        }
+        .tutorial-presenters {
+            margin: 0 0 16px;
+            color: #486581;
+        }
+        .tutorial-events {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        .tutorial-event {
+            padding: 12px 14px;
+            border: 1px solid #d9e5f2;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.8);
+        }
+        .tutorial-event strong,
+        .tutorial-event span {
+            display: block;
+        }
+        .tutorial-event span {
+            color: #486581;
+            font-size: 0.94rem;
+        }
+        .tutorial-materials {
+            font-weight: 700;
+        }
         @media (max-width: 640px) {
             .hero {
                 padding: 20px 18px;
             }
             .hero h1 {
                 font-size: 2rem;
+            }
+            .tutorial-events {
+                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -197,6 +245,29 @@
 			<li>Autumn 2025, <span class="course-title">CSE 3461: Computer Networking and Internet Technologies</span>, The Ohio State University.</li>
             <li>Spring 2025, <span class="course-title">CSE 2431: System II: Introduction to Operating Systems</span>, The Ohio State University.</li>
         </ul>
+    </section>
+
+
+    <section class="tutorials">
+        <h2>Tutorials</h2>
+        <article class="tutorial-card">
+            <h3><a href="vldb26-tutorial/">Hardware Acceleration for Spatial Databases: Building Next-Generation Query Engines Using Ray Tracing Cores</a></h3>
+            <p class="tutorial-summary">How ray tracing cores can accelerate spatial query engines, from hardware fundamentals and spatial operators to indexing, distance computation, and Apache SedonaDB integration.</p>
+            <p class="tutorial-presenters"><strong>Presenters:</strong> Rubao Lee, Liang Geng, and Xiaodong Zhang</p>
+            <div class="tutorial-events">
+                <div class="tutorial-event">
+                    <strong><a href="https://www.vldb.org/2026/" target="_blank">VLDB 2026</a></strong>
+                    <span>August 31-September 4, 2026</span>
+                    <span>Boston, Massachusetts, USA</span>
+                </div>
+                <div class="tutorial-event">
+                    <strong><a href="https://sigspatial2026.sigspatial.org/" target="_blank">ACM SIGSPATIAL 2026</a></strong>
+                    <span>November 3-6, 2026</span>
+                    <span>Riverside, California, USA</span>
+                </div>
+            </div>
+            <a class="tutorial-materials" href="vldb26-tutorial/">Tutorial page: paper, slides, code, and outline &rarr;</a>
+        </article>
     </section>
 
 

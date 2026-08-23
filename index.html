@@ -215,103 +215,6 @@
         .tutorial-materials {
             font-weight: 700;
         }
-        .honors-awards {
-            position: relative;
-            isolation: isolate;
-            overflow: hidden;
-            margin: 28px 0;
-            padding: 28px;
-            border: 1px solid #d7e3f2;
-            border-radius: 20px;
-            background: linear-gradient(145deg, #ffffff 0%, #f5f9ff 58%, #edf4ff 100%);
-            box-shadow: 0 14px 32px rgba(16, 42, 67, 0.08);
-        }
-        .honors-awards::after {
-            content: "";
-            position: absolute;
-            z-index: -1;
-            right: -90px;
-            top: -100px;
-            width: 250px;
-            height: 250px;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(23, 78, 166, 0.12) 0%, rgba(23, 78, 166, 0) 70%);
-        }
-        .honors-eyebrow {
-            display: block;
-            margin-bottom: 4px;
-            color: #174ea6;
-            font-size: 0.78rem;
-            font-weight: 700;
-            letter-spacing: 0.14em;
-            text-transform: uppercase;
-        }
-        .honors-awards h2 {
-            margin: 0;
-            color: #102a43;
-        }
-        .honors-intro {
-            margin: 6px 0 0;
-            color: #486581;
-        }
-        .awards-list {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 14px;
-            margin: 22px 0 0;
-        }
-        .award-card {
-            display: grid;
-            grid-template-columns: 66px minmax(0, 1fr);
-            gap: 15px;
-            align-items: start;
-            padding: 18px;
-            border: 1px solid #d9e5f2;
-            border-radius: 15px;
-            background: rgba(255, 255, 255, 0.92);
-            box-shadow: 0 8px 20px rgba(16, 42, 67, 0.05);
-            transition: transform 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease;
-        }
-        .award-card:hover {
-            transform: translateY(-2px);
-            border-color: #a9c2e8;
-            box-shadow: 0 12px 26px rgba(16, 42, 67, 0.1);
-        }
-        .award-year {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 34px;
-            border-radius: 999px;
-            background: #e8f0fe;
-            color: #174ea6;
-            font-size: 0.9rem;
-            font-weight: 700;
-            letter-spacing: 0.02em;
-        }
-        .award-title {
-            color: #16324f;
-            font-weight: 700;
-            line-height: 1.35;
-            text-decoration: none;
-        }
-        a.award-title:hover {
-            color: #174ea6;
-            text-decoration: underline;
-            text-underline-offset: 3px;
-        }
-        .award-issuer {
-            display: block;
-            margin-top: 6px;
-            color: #486581;
-            font-size: 0.94rem;
-            line-height: 1.45;
-        }
-        @media (max-width: 860px) {
-            .awards-list {
-                grid-template-columns: 1fr;
-            }
-        }
         @media (max-width: 640px) {
             .hero {
                 padding: 20px 18px;
@@ -321,14 +224,6 @@
             }
             .tutorial-events {
                 grid-template-columns: 1fr;
-            }
-            .honors-awards {
-                padding: 22px 18px;
-            }
-            .award-card {
-                grid-template-columns: 58px minmax(0, 1fr);
-                gap: 12px;
-                padding: 16px;
             }
         }
     </style>
@@ -383,38 +278,12 @@
 
 
     <section class="honors-awards">
-        <span class="honors-eyebrow">Recognition</span>
         <h2>Honors and Awards</h2>
-        <p class="honors-intro">Selected recognition for contributions to teaching, research, and data systems.</p>
-        <ul class="awards-list" aria-label="Honors and awards by year">
-            <li class="award-card">
-                <span class="award-year">2026</span>
-                <div>
-                    <a class="award-title" href="https://cse.osu.edu/news/2026/04/celebrating-excellence-30th-annual-cse-awards-banquet-wrap" target="_blank" rel="noopener">Faculty Teaching Award</a>
-                    <span class="award-issuer">Department of Computer Science and Engineering, The Ohio State University</span>
-                </div>
-            </li>
-            <li class="award-card">
-                <span class="award-year">2024</span>
-                <div>
-                    <span class="award-title">VLDB Test of Time Award</span>
-                    <span class="award-issuer">Very Large Data Base Endowment Inc.</span>
-                </div>
-            </li>
-            <li class="award-card">
-                <span class="award-year">2018</span>
-                <div>
-                    <a class="award-title" href="https://engineering.osu.edu/news/2018/04/college-honors-distinguished-faculty-researchers-annual-awards-ceremony" target="_blank" rel="noopener">Lumley Engineering Research Award</a>
-                    <span class="award-issuer">College of Engineering, The Ohio State University</span>
-                </div>
-            </li>
-            <li class="award-card">
-                <span class="award-year">2011</span>
-                <div>
-                    <span class="award-title">ICDCS Best Paper Award</span>
-                    <span class="award-issuer">31st International Conference on Distributed Computing Systems</span>
-                </div>
-            </li>
+        <ul>
+            <li><a href="https://cse.osu.edu/news/2026/04/celebrating-excellence-30th-annual-cse-awards-banquet-wrap" target="_blank" rel="noopener">Faculty Teaching Award</a> – Department of Computer Science and Engineering, The Ohio State University, 2026</li>
+            <li>VLDB Test of Time Award – Very Large Data Base Endowment Inc., 2024</li>
+            <li><a href="https://engineering.osu.edu/news/2018/04/college-honors-distinguished-faculty-researchers-annual-awards-ceremony" target="_blank" rel="noopener">Lumley Engineering Research Award</a> – College of Engineering, The Ohio State University, 2018</li>
+            <li>ICDCS Best Paper Award – The 31st International Conference on Distributed Computing Systems, 2011</li>
         </ul>
     </section>
 
